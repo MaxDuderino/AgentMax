@@ -112,7 +112,7 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 - Checkpoint branches older than 14 days get flagged for cleanup; Key Keeper blocks a commit when it finds a secret. **AI, unconfirmed**
 - Table Check (video-game vs tabletop) is DnD-Max only. Not part of the general lineup. **Max**
 - Every project gets a VISION.md for Vision Keeper to check against. **Max**
-- The lineup lives in its own public GitHub repo (MaxDuderino/AgentMax) that every project points to, and must work in Claude chat, Claude Code, GPT, Gemini / AI Studio and Visual Studio AI. **Max**
+- The lineup lives in its own private GitHub repo (MaxDuderino/AgentMax; made private 2026-10-15, "i mean no longer public") that every project points to, and must work in Claude chat, Claude Code, GPT, Gemini / AI Studio and Visual Studio AI. **Max**
 
 
 ---

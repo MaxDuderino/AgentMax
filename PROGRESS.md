@@ -4,13 +4,21 @@
 **Partial:** nothing has run in ChatGPT, Gemini or Visual Studio yet; the Windows installer hasn't run on Windows.
 **Next up:** install it for real (Claude chat zips + `install.ps1`); first Session Kickoff on a real project; Vision Keeper writes AgentMax's own VISION.md.
 **Waiting on Max:**
-- Turn on GitHub secret scanning + push protection for AgentMax and DnD-Max (Key Keeper SKILL.md has the steps). Owner: Max.
+- ~~Turn on GitHub secret scanning + push protection~~ Done on AgentMax (screenshot, 2026-10-15). DnD-Max still to check. Owner: Max.
 - Merge the DnD-Max QA report branch `docs/agentmax-qa-2026-10-15`, and delete or keep test table QXT-RZN. Owner: Max, or a DnD-Max session.
 - Approve BVD personas v4.5-draft, or say what to change. Owner: Max.
 
 # Progress Log
 
 Newest on top. Each entry quotes the request that caused it.
+
+---
+
+## 2026-10-15 · AgentMax goes private (light mode)
+
+> "gonna make it no longer private as well" … "i mean no longer public"
+
+- RULES.md scope note now says the repo is private. Push protection and Secret Protection are confirmed on (Max's screenshot).
 ---
 
 ## 2026-10-15 · Built every fix from the BVD review
