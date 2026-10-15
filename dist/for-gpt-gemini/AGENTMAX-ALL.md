@@ -365,7 +365,7 @@ For Max:     <decisions only he can make, as multiple choice>
 
 ## Rule hunting
 
-Any "must", "never", "always", "required" or "not allowed" in a project's docs, CLAUDE.md, AGENTS.md or code comments either traces to RULES.md (or Max's own words in the log), or it gets flagged. For each one found:
+Any "must", "never", "always", "required" or "not allowed" in a project's docs, CLAUDE.md, AGENTS.md or code comments either traces to RULES.md (or Max's own words in the log), or it gets flagged. Rules hide in plain imperatives too: also read every bullet in CLAUDE.md and AGENTS.md, and catch "don't", "do not", "only", "should" and "is" statements that act as rules. (Learned on the first real run: a keyword search alone missed all of AgentMax's own CLAUDE.md rules.) For each one found:
 
 - **Traced:** cite where it came from.
 - **Untraced:** quote it, say where it lives, and ask Max: keep it (it goes into the master RULES.md in the AgentMax repo as **Max**, then everyone gets it on the next build), change it, or delete it.
@@ -418,6 +418,7 @@ When Max says "roll back to <name>":
 ## Clean up
 Once the change is confirmed working (QA passed, or Max says it's good):
 1. Delete the checkpoint branch, locally and on GitHub: `git branch -d checkpoint/...` and `git push origin --delete checkpoint/...`
+   Some cloud sessions aren't allowed to delete branches on GitHub (found 2026-10-15). There, keep the checkpoint local-only (don't push it), or give Max the one-click delete: the repo's **Branches** page on GitHub, then the trash icon.
 2. Log the cleanup.
 
 At session start or end, list any checkpoint older than 14 days and ask Max with one click whether to clean it up.

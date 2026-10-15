@@ -16,19 +16,19 @@ Honest by rule: an agent is only ✅ once it has done a real job.
 
 | Agent | Job | Called by | Status |
 |---|---|---|---|
-| **Session Kickoff** | Where we are, next moves, calls the crew | Max, at session start | 🔍 Built, not run |
+| **Session Kickoff** | Where we are, next moves, calls the crew | Max, at session start | ✅ Proven 2026-10-15 (kicked off the v1.0 shakedown on AgentMax) |
 | **Wrap** | Key Keeper + Translator + Scribe + commit note, one readout | End of every change | ✅ Proven 2026-10-15 (wrapped the BVD-review fixes) |
 | **BVD** | 11-persona review council | Kickoff for big plans, or Max | ✅ Proven 2026-10-15 (Full Council lineup review) · personas v4.5 approved |
-| **Vision Keeper** | Writes VISION.md; checks plans; hunts untraced rules | Kickoff, phase boundaries | 🔍 Built, not run |
-| **Checkpoint** | Restore point, one-step rollback, cleanup | Kickoff, before risky moves | 🧪 Tested (rollback rehearsed with a merge commit) |
-| **Key Keeper** | Secret scanner + commit hook + GitHub push protection | The Wrap, project setup | 🧪 Tested (11 leak and false-alarm cases, hook keeps old hooks and survives a moved folder) |
+| **Vision Keeper** | Writes VISION.md; checks plans; hunts untraced rules | Kickoff, phase boundaries | ✅ Proven 2026-10-15 (wrote AgentMax's VISION.md, flagged 2 untraced rules) |
+| **Checkpoint** | Restore point, one-step rollback, cleanup | Kickoff, before risky moves | ✅ Proven 2026-10-15 (checkpoint + cleanup on AgentMax; rollback rehearsed with a merge commit) |
+| **Key Keeper** | Secret scanner + commit hook + GitHub push protection | The Wrap, project setup | ✅ Proven 2026-10-15 (hook guards AgentMax's real commits; push protection on) |
 | **QA Team** | Henry + Smoke Tester, Bug Wrangler, Hollow-Feature Audit | After deploys, "is it done?" | ✅ Proven 2026-10-15 (DnD-Max live play-through) |
-| **Focus Group** | 9 generic testers for any app or game | Only when Max asks | 🔍 Built, not run |
-| **Deploy Doctor** | Vercel logs → diagnosis → proposed fix | A deploy breaks | 🔍 Built, not run |
-| **Asset Forge** | Style bible, prompts, clickable copy queue | Art requests | 🧪 Tested (example queue) |
+| **Focus Group** | 9 generic testers for any app or game | Only when Max asks | ✅ Proven 2026-10-15 (Quick Playtest of AgentMax's install) · live-app run pending |
+| **Deploy Doctor** | Vercel logs → diagnosis → proposed fix | A deploy breaks | 🔍 Built, not run · on Max's shakedown list |
+| **Asset Forge** | Style bible, prompts, clickable copy queue | Art requests | 🧪 Tested (example queue) · real run on Max's shakedown list |
 | **Translator** | Plain-English change report | Inside the Wrap; on request | ✅ Proven 2026-10-15 (inside the Wrap) |
 | **Scribe** | Log entries, status overview, commit notes | Inside the Wrap; on request | ✅ Proven 2026-10-15 (inside the Wrap) |
-| **Handoff Packer** | Cross-tool HANDOFF.md | Only when Max asks | 🔍 Built, not run |
+| **Handoff Packer** | Cross-tool HANDOFF.md | Only when Max asks | ✅ Proven 2026-10-15 (AgentMax HANDOFF.md) |
 
 **Not agents:** the Rule Ledger is RULES.md itself, and Vision Keeper enforces it. ~~Table Check~~ lives in DnD-Max only.
 

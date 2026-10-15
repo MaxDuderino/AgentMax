@@ -39,6 +39,7 @@ When Max says "roll back to <name>":
 ## Clean up
 Once the change is confirmed working (QA passed, or Max says it's good):
 1. Delete the checkpoint branch, locally and on GitHub: `git branch -d checkpoint/...` and `git push origin --delete checkpoint/...`
+   Some cloud sessions aren't allowed to delete branches on GitHub (found 2026-10-15). There, keep the checkpoint local-only (don't push it), or give Max the one-click delete: the repo's **Branches** page on GitHub, then the trash icon.
 2. Log the cleanup.
 
 At session start or end, list any checkpoint older than 14 days and ask Max with one click whether to clean it up.
