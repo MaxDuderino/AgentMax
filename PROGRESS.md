@@ -4,6 +4,26 @@ Newest on top. Each entry quotes the request that caused it.
 
 ---
 
+## 2026-10-15 · First QA Team run: Hollow-Feature Audit on DnD-Max (read-only pass)
+
+> "make it so" (agreeing to: point the Hollow-Feature Audit at DnD-Max)
+
+**What happened**
+- Pulled every issue status from DnD-Max: 153 ✅ done, 251 🔍 built but never tried by a person, 19 ⬜, 1 🚧.
+- Clicked through the live site in the built-in browser, signed in as DemoUSer2: home, games, create game (viewed, not submitted), adventures, characters, discover, forge, account, leaderboards. Every page loaded, no console errors, no one-option dropdowns, no "coming soon" text. The disabled buttons are waiting on input, which is normal.
+- Found that DnD-Max's own depth audit (2026-10-15 morning, docs/testing/depth-audit-2026-10-15.md) already did the code-side hollow hunt and filed issues 410–440. The audit agrees with it and didn't duplicate it.
+
+**Findings for Max**
+- The surface is solid. The hollowness is underneath, as the depth audit says: thin content on deep engines.
+- 251 features have never been driven by a person. That's the real QA gap, and it needs live play-throughs.
+- Ten wave-1 crews (issues 410–421) were cut off by the session limit. Their work sits unmerged on `wip/agent-…` branches. Nothing from them is live.
+
+**Not done / not tested**
+- No table was created or played. That writes to the live site, so it waits on Max's OK.
+- Multi-player, dice, combat and DMax flows were not tried this run.
+
+---
+
 ## 2026-10-15 · Road crew and bonus tracks built: 9 more agents
 
 > "make it so"
