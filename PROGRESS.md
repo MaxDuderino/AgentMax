@@ -4,6 +4,32 @@ Newest on top. Each entry quotes the request that caused it.
 
 ---
 
+## 2026-10-15 · QA Team live play-through of DnD-Max
+
+> "Yes, play a solo table (Recommended)"
+
+**What happened**
+- Played Gutterfang Warren solo on the live site as DemoUSer2: start, pick a hero, roll, move, a full fight, loot, and a rules question. Full report: `reports/dnd-max/2026-10-15-qa-live-playthrough.md`.
+- **Release call: SHIP WITH NOTES.** The core loop plays well, and DMax is funny.
+
+**Findings**
+- 🕳️ **"Can I do this?" (Issue 252, marked ✅) answers nothing on the default "Play it now" table.** No ruleset is pinned, so it says "your call," then contradicts itself with "This is what the ruleset says."
+- 🕳️ **Every hero gets every resource:** a Fighter with a Familiar and spell Mana.
+- ❓ Poke DMax showed no visible reaction. Needs a human look.
+- ❓ Some board plates sit off-screen at phone width. Needs a real phone.
+- ✅ The two-click move is by design (Max's own call, Issue 295). Not a bug.
+
+**Max's decisions**
+- The ten unmerged wave-1 branches stay with the DnD-Max project.
+
+**Not done / not tested**
+- Multiplayer, projector, watch links, saves, builder, Forge, Crawler, other rulesets.
+- The browser pane was hidden, so clicks were fired from the page's own code, not a mouse. A person should repeat the hands-on parts.
+- Bug reports are drafted in the report, not filed. The AgentMax session only has read access to DnD-Max.
+- Left one unlisted test table (QXT-RZN) on the live site.
+
+---
+
 ## 2026-10-15 · First QA Team run: Hollow-Feature Audit on DnD-Max (read-only pass)
 
 > "make it so" (agreeing to: point the Hollow-Feature Audit at DnD-Max)
