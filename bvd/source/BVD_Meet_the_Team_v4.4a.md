@@ -5,7 +5,7 @@
 > **Provenance:** Reconstructed from prior BVD conversations, including user-approved v4.4a. Not a recovered original master file. “Established” sections preserve known canon; design prompts, procedures, example dialogue and inferred competencies are editorial implementation guidance unless otherwise stated. No verified fixed ages, physical likenesses or full legal names are silently invented.
 
 ## At a glance
-BVD is the **BullKoch Variant Division**, an eleven-member persona advisory ensemble initially based on founders Max Bullis and Matt Koch. **BCL** (BullKoch Command Line) names its command/directive language or coordination protocol; it is not identical to the BVD roster. The user/operator, **The Dude**, makes final decisions. The current persona version is **v4.4a (accepted 19 October 2025)**, not the earlier clone-name rosters.
+BVD is the **BullKoch Variant Division**, an eleven-member persona advisory ensemble initially based on founders Max Bullis and Mattimax. **BCL** (BullKoch Command Line) names its command/directive language or coordination protocol; it is not identical to the BVD roster. The user/operator, **The Dude**, makes final decisions. The current persona version is **v4.4a (accepted 19 October 2025)**, not the earlier clone-name rosters.
 
 | # | Persona | Primary seat | Distinguishing voice |
 |---|---|---|---|

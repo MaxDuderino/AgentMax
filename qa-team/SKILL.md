@@ -36,6 +36,10 @@ In Claude Code, run the roles as `qa-smoke-tester`, `qa-bug-wrangler` and `qa-ho
 - **Scale to the change.** A text fix gets one check. A new feature gets the full flow.
 - **Check the deploy first.** If the Vercel connector is available, confirm the latest deployment actually succeeded before testing the site.
 - **Mobile counts.** Check phone width on every flow you test.
+- **Access counts (Max: real weight).** Every smoke test includes a keyboard pass. Access blockers are reported every time, even when the call is SHIP.
+- **Reports live in the project being tested,** under `docs/testing/` in that project's repo. Never in AgentMax.
+- **Clean up test data.** List every table, account, upload or record a run creates on a live site. Delete it at the end, or get Max's OK to leave it.
+- **Role subagents report; the lead writes.** Roles can't edit files or file issues. Henry saves reports and files issues when Max says go.
 
 ## What to hand back
 
@@ -49,7 +53,9 @@ Release call: SHIP IT / SHIP WITH NOTES / HOLD
 ✅ Works:     <flow — evidence>
 ❌ Broken:    <flow — what happens — bug link>
 🕳️ Hollow:    <item — what's missing to make it real>
+♿ Access:    <keyboard / focus / screen-reader findings, or "not checked" with why>
 ❓ Unchecked: <what we couldn't test and why>
+🧹 Test data: <what this run created, and whether it was cleaned up>
 
 Next: <fixes in order of dependency, not effort>
 ```

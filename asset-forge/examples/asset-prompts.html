@@ -26,6 +26,8 @@ button:hover{border-color:var(--ink)}button:focus-visible,select:focus-visible{o
 details summary{cursor:pointer;color:var(--muted);font-size:.9rem}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;opacity:0;transition:opacity .2s}
 .toast.on{opacity:1}
+.card.just-done{outline:3px solid var(--done)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style></head><body><div class="wrap">
 <h1>Example Project Asset Queue</h1>
 <p class="meta">Paste the style bible into a fresh ChatGPT chat once per family, then work down the list. Marks here are remembered in this browser; use "Copy status update" to send them back so the real list gets updated.</p>
@@ -44,6 +46,7 @@ let marks={};try{marks=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
 const st=a=>marks[a.id]||a.status||"todo";
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(marks))}catch(e){}};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const fams=[...new Set(DATA.assets.map(a=>a.family||"Other"))];
 document.getElementById("fam").innerHTML='<option value="all">All families</option>'+fams.map(f=>`<option>${esc(f)}</option>`).join("");
 function toast(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("on");setTimeout(()=>el.classList.remove("on"),1400)}
@@ -59,17 +62,18 @@ function render(){
     <div class="prompt">${esc(a.prompt)}</div>
     ${(a.variants||[]).length?`<details><summary>${a.variants.length} alternate prompts</summary>${a.variants.map((v,i)=>`<div class="prompt">${esc(v)}</div><button data-act="cv" data-id="${esc(a.id)}" data-i="${i}">Copy alternate ${i+1}</button>`).join("")}</details>`:""}
     ${a.notes?`<div class="meta">Note: ${esc(a.notes)}</div>`:""}
-    <div class="row"><button class="primary" data-act="cp" data-id="${esc(a.id)}">Copy prompt</button><button data-act="cf" data-id="${esc(a.id)}">Copy file name</button>
-    <button data-act="done" data-id="${esc(a.id)}">Done</button><button data-act="redo" data-id="${esc(a.id)}">Redo</button><button data-act="skip" data-id="${esc(a.id)}">Skip</button><button data-act="todo" data-id="${esc(a.id)}">Reset</button></div>
+    <div class="row" role="group" aria-label="${esc(a.name)}"><button class="primary" data-act="cp" data-id="${esc(a.id)}" aria-label="Copy prompt: ${esc(a.name)}">Copy prompt</button><button data-act="cf" data-id="${esc(a.id)}" aria-label="Copy file name: ${esc(a.name)}">Copy file name</button>
+    <button data-act="done" data-id="${esc(a.id)}" aria-label="Mark done: ${esc(a.name)}">Done</button><button data-act="redo" data-id="${esc(a.id)}" aria-label="Mark redo: ${esc(a.name)}">Redo</button><button data-act="skip" data-id="${esc(a.id)}" aria-label="Skip: ${esc(a.name)}">Skip</button><button data-act="todo" data-id="${esc(a.id)}" aria-label="Reset: ${esc(a.name)}">Reset</button></div>
   </article>`).join("")||'<p class="meta">Nothing here. Change the filters, or the whole list is done.</p>';
 }
 document.addEventListener("click",e=>{const b=e.target.closest("button[data-act]");if(!b)return;const a=DATA.assets.find(x=>x.id===b.dataset.id);if(!a)return;
   const act=b.dataset.act;
   if(act==="cp")copy(a.prompt,"Prompt copied");else if(act==="cf")copy(a.file||"","File name copied");else if(act==="cv")copy(a.variants[+b.dataset.i],"Alternate copied");
-  else{marks[a.id]=act;save();render()}});
+  else{marks[a.id]=act;save();const c=document.getElementById("c-"+a.id);
+    if(c&&act==="done"){c.classList.add("just-done");const s=c.querySelector(".st");if(s){s.textContent="done ✓";s.className="st done"}toast(`Nice: ${a.name} done`);setTimeout(render,reduce?0:900)}else render()}});
 document.getElementById("fam").onchange=render;document.getElementById("flt").onchange=render;
 document.getElementById("next").onclick=()=>{const f=document.getElementById("fam").value;const a=DATA.assets.find(x=>["todo","redo"].includes(st(x))&&(f==="all"||(x.family||"Other")===f));if(!a){toast("All caught up");return}
-  document.getElementById("flt").value="all";render();const c=document.getElementById("c-"+a.id);c.scrollIntoView({block:"center"});c.classList.add("flash");setTimeout(()=>c.classList.remove("flash"),1500);copy(a.prompt,`Copied: ${a.name}`)};
+  if(!visible().includes(a)){document.getElementById("flt").value="all";render();toast("Showing all, so you can see the next one")}const c=document.getElementById("c-"+a.id);c.scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"});c.classList.add("flash");setTimeout(()=>c.classList.remove("flash"),1500);copy(a.prompt,`Copied: ${a.name}`)};
 document.getElementById("report").onclick=()=>{const g={};DATA.assets.forEach(a=>{if(marks[a.id]&&marks[a.id]!==(a.status||"todo"))(g[marks[a.id]]=g[marks[a.id]]||[]).push(a.id)});
   const t=Object.keys(g).length?"Asset Forge status update for "+DATA.project+": "+Object.entries(g).map(([k,v])=>k+": "+v.join(", ")).join("; "):"";t?copy(t,"Status update copied. Paste it to Claude"):toast("No changes to report")};
 render();

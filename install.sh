@@ -13,5 +13,5 @@ for d in "$here"/*/; do
   echo "Skill installed: $s"
 done
 cp "$here"/claude-code/agents/*.md "$HOME/.claude/agents/"
-echo "Subagents installed to $HOME/.claude/agents (11 BVD seats, 8 testers, 3 QA roles)"
+echo "Subagents installed to $HOME/.claude/agents (11 BVD seats, 9 testers, 3 QA roles)"
 echo "Restart Claude Code, then try: /session-kickoff or /bvd"

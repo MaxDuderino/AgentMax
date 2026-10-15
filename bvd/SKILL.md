@@ -68,7 +68,7 @@ Small stuff gets light mode: a typo or a type fix doesn't need a council at all,
 - **Security is low priority** on personal projects. Exception: leaked secrets.
 - **Fun is a requirement.** Keep the tone positive, excited and funny.
 
-The full list with sources lives in RULES.md at the root of the lineup.
+The full list, with where each rule came from, is in RULES.md in this skill's folder.
 
 ## What to hand back
 

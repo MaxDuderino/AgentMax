@@ -25,8 +25,16 @@ When an AI rewrite goes sideways, Max gets back to working in one step instead o
 When Max says "roll back to <name>":
 1. Show what will be undone: the commits since the checkpoint, in plain words.
 2. Get his yes. Rolling back throws work away.
-3. Prefer a revert commit (keeps history) over a hard reset. Use `git revert --no-edit <checkpoint>..HEAD` for a clean range, or restore the checkpoint's files in a new commit.
-4. Push, give commit notes, and log it.
+3. Make sure nothing is half-done: commit or stash uncommitted changes first.
+4. Restore the checkpoint's files in **one step and one new commit**. History is kept, so the rollback itself can be undone:
+   ```
+   git read-tree -u --reset checkpoint/<name>
+   git commit -m "Roll back to checkpoint <name>"
+   ```
+   This handles merges and conflicts that a commit-by-commit `git revert` chokes on. Rehearsed 2026-10-15 on a repo with a merge commit: the revert failed, this restored the files exactly.
+5. Check it: `git diff checkpoint/<name> HEAD` should show nothing.
+6. **If anything goes wrong mid-way:** `git reset --hard HEAD` puts the working copy back to the last commit. Nothing is lost, because the checkpoint branch still exists.
+7. Push, give commit notes, and log it.
 
 ## Clean up
 Once the change is confirmed working (QA passed, or Max says it's good):

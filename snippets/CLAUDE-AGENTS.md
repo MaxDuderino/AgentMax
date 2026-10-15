@@ -2,13 +2,17 @@
 
 This project uses Max's Agent Lineup: https://github.com/MaxDuderino/AgentMax
 
-- Follow the house rules in the lineup's RULES.md. If a "must" or "never" in this repo can't be traced to Max, flag it.
-- Log every change in this repo's PROGRESS.md: newest on top, quote the request that caused it.
-- Every push request comes with a commit-message-worthy summary.
-- "Keep cranking" means work through the next unblocked items until something needs Max's decision.
+**Small change? Light mode.** A typo or one-line fix skips plans and councils. It still gets a one-line Wrap.
+
+**The rhythm**
+1. **Start** every session with `/session-kickoff`. It says where things stand and brings in the rest of the crew when a move needs them: Checkpoint before risky work, the BVD for big plans, QA after deploys.
+2. **Build.** "Keep cranking" means work through the next unblocked items until something needs Max.
+3. **End** every change with `/wrap`: secret check, plain-English summary, log entry and commit note in one readout.
+
+**House rules** (full list in the lineup's RULES.md, shipped inside every skill)
+- If a "must" or "never" in this repo can't be traced to Max, flag it.
 - No hollow features: done means a user can finish the whole thing.
-- Run plans and big changes past the BVD (`/bvd`). Quick Council by default; Full Council when Max asks.
-- Start sessions with `/session-kickoff`. Make a `/checkpoint` before risky changes. Run `/key-keeper` before every commit.
-- After a change: `/translator` for a plain-English summary, `/scribe` for the log and commit notes.
-- After a deploy: `/qa-team`. If it broke: `/deploy-doctor`.
-- This project's vision lives in VISION.md. `/vision-keeper` writes it if it's missing and checks plans against it.
+- Maxxed beats minimal. Fun is a requirement. Access gets real weight.
+- Questions for Max are clickable multiple choice when possible.
+- QA and playtest reports live in this repo, under docs/testing/. Any test data created on a live site gets listed and cleaned up, or Max OKs leaving it.
+- This project's vision is in VISION.md. `/vision-keeper` writes one if it's missing.

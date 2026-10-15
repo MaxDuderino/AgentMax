@@ -1,11 +1,11 @@
 ---
 name: focus-group
-description: Runs Max's Focus Group, an 8-tester playtest crew (Noob, First-Time Host, PRO, Vet, Person on the Street, Dad Gamer, Teen Gamer, Pro Live Streamer) against any app or game. Use only when Max asks for a playtest, focus group, demo crew, demo weekend, or for the testers by name (Pat, Duke, Nadia, Grizz, Sam, Dale, Kai, Jax).
+description: Runs Max's Focus Group, a 9-tester playtest crew (Noob, First-Time Host, PRO, Vet, Person on the Street, Dad Gamer, Teen Gamer, Pro Live Streamer, Screen Reader User) against any app or game. Use only when Max asks for a playtest, focus group, demo crew, demo weekend, or for the testers by name (Pat, Duke, Nadia, Grizz, Sam, Dale, Kai, Jax, Lee).
 ---
 
 # Focus Group
 
-Eight testers who play Max's builds the way real people would, then report back. They work for any app or game: their specialty is filled in per project.
+Nine testers who play Max's builds the way real people would, then report back. They work for any app or game: their specialty is filled in per project.
 
 Runs **only when Max asks**.
 
@@ -21,6 +21,7 @@ Runs **only when Max asks**.
 | Dale | The Dad Gamer | Having 45 minutes and a baby monitor |
 | Kai | The Teen Gamer | Mashing, swiping and exploiting |
 | Jax | The Pro Live Streamer | Playing it live for chat |
+| Lee | The Screen Reader User | Never touching a mouse or seeing the screen |
 
 Persona files live in `testers/`. Read the file for every tester you use.
 
@@ -38,8 +39,8 @@ If you can't tell, ask Max with a quick multiple-choice question.
 **Quick Playtest (default).** You voice the testers yourself from their files. Max can name a subset ("just Pat and Grizz").
 
 **Full Playtest.** When Max says "full playtest", "whole crew", or "demo weekend".
-- **In Claude Code:** launch the eight `fg-<slug>` subagents in parallel in one message, each with the same brief and the live URL. Each tests in their own context.
-- **Without subagents:** voice all eight yourself, and say so.
+- **In Claude Code:** launch the nine `fg-<slug>` subagents in parallel in one message, each with the same brief and the live URL. Each tests in their own context.
+- **Without subagents:** voice all nine yourself, and say so.
 
 If browser tools are available, testers **actually click through the live site**. A tester who only read the code says so. Never report something as tried unless it was.
 
@@ -71,4 +72,4 @@ Hollow:    <anything that looked like a feature but went nowhere>
 Unchecked: <what nobody could try>
 ```
 
-Bugs found go to the QA Team's Bug Wrangler. Log the session in PROGRESS.md, newest on top, with a quote of Max's request.
+Bugs found go to the QA Team's Bug Wrangler. Reports live in the tested project's repo under `docs/testing/`, and any test data created on a live site gets listed and cleaned up, or Max OKs leaving it. Log the session in PROGRESS.md, newest on top, with a quote of Max's request.

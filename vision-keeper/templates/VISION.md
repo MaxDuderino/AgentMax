@@ -8,6 +8,7 @@ _Written with Max on YYYY-MM-DD. Max's literal words are in quotes. Anything mar
 ## Who it's for
 - <who uses it>
 - <what they should feel when they use it>
+- <who needs to be able to use it: keyboard only, screen reader, one hand, small phone, big TV>
 
 ## The Maxxed feature list
 Everything Max wants. Feature-rich beats minimal.

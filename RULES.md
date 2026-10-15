@@ -24,6 +24,7 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 | 6 | Max starts with the big idea, often voice notes and off the cuff. Interpret it, confirm it with him, then get detailed as it fleshes out. | Max |
 | 7 | Max relies on AI agents for QA and live-site testing, and wants their feedback and inspiration. | Max |
 | 8 | Show your reasoning, not just results. Max reads all the feedback and wants to learn along the way. | Max |
+| 8a | **Access gets real weight.** QA does a keyboard pass on every smoke test, access blockers are always reported, and the Focus Group includes a screen-reader tester. (Max chose "Give it real weight" over "report it" and "low priority", 2026-10-15.) | Max |
 
 ## Building
 
@@ -66,7 +67,11 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 - The Focus Group is generic: testers specialize in whatever the app or game is ("vet in whatever the applicable app or game is"), so it works for any project. **Max**
 - The Focus Group runs only when Max asks. **Max**
 - QA Team: Henry leads; Smoke Tester, Bug Wrangler and Hollow-Feature Audit. **Max**
-- Focus Group tester names (Pat, Duke, Nadia, Grizz, Sam, Dale, Kai, Jax) are placeholders, partly reused from the Demo Weekend cast. **AI, unconfirmed**
+- QA and playtest reports live in the tested project's repo, never in AgentMax. **Max** ("In the DnD-Max repo", 2026-10-15)
+- AgentMax sessions build agents. Running the crew on another project happens in that project. **Max** ("this is an agent build project", 2026-10-15)
+- The BVD co-founder seat is called Mattimax; the real person's name stays out of the files. Mattimax and Matthew are two different people. **Max**
+- Test data created on a live site gets listed and cleaned up, or Max OKs leaving it. **AI, unconfirmed** (from the BVD review)
+- Focus Group tester names (Pat, Duke, Nadia, Grizz, Sam, Dale, Kai, Jax, Lee) are placeholders, partly reused from the Demo Weekend cast. **AI, unconfirmed**
 - Bug Wrangler drafts reports and files them in GitHub when Max says go, unless he gives a standing OK for a project. **AI, unconfirmed**
 - Deploy Doctor diagnoses and proposes fixes. Rollbacks, redeploys and setting changes need Max's OK each time. **Max**
 - Asset Forge works for manual ChatGPT use, one prompt at a time, no APIs. **Max**

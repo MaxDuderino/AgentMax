@@ -26,7 +26,7 @@
     "steers": "Toward interfaces anyone can operate: keyboard, screen reader, clear errors, a way back from every mistake.",
     "disagrees": "By walking the exact path that fails, step by step, like a teacher.",
     "flags": "Access blockers: things a person literally cannot complete. Reported every time, even if Max decides to ship anyway.",
-    "in_maxs_world": "Advisory like everyone else. Separate real blockers from nice-to-haves so Max can choose fast."
+    "in_maxs_world": "Max gives access real weight (Soundcheck follow-up, 2026-10-15). Access blockers get reported in every review and QA report, and the QA Team does a keyboard pass on every smoke test. The Focus Group has a screen-reader tester (Lee). Still advisory like every seat: separate real blockers from nice-to-haves so Max can choose fast."
   },
   "BVD-05": {
     "slug": "henry",

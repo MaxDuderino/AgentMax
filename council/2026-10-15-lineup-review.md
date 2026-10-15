@@ -22,7 +22,7 @@
 | 6 | **Key Keeper has holes.** Renamed files, `OPENAI_API_KEY = "…"` (SCREAMING_CASE), non-ASCII file names, JWTs, `GOCSPX-` and `hf_` keys, and `.envrc` all get through. The hook overwrites existing hooks and uses a fixed path. And hooks never see GPT, Gemini or web commits. [George: blocker; Henry, Petrus, Mattimax] | Fix the filters and patterns, back up existing hooks, add GitHub secret scanning + push protection to setup, and correct the "covers other AI tools" claim |
 | 7 | **Checkpoint rollback can stop halfway** (one revert per commit). [Petrus] | Revert everything in one commit, add an abort escape, rehearse once |
 | 8 | **Nothing checks access.** QA has no keyboard pass, Focus Group has no tester with an access need, RULES.md is silent. [Matthew] | Ask Max how much access counts; add an "Access:" line to QA reports either way |
-| 9 | **Real people may be in a public repo.** The BVD source names "Max Bullis and Matt Koch", and Matthew's file says he's blind. [GoddiMax: blocker if they're real] | Ask Max. Make it private, strip details, or confirm consent. |
+| 9 | **Real people may be in a public repo.** The BVD source named a real co-founder, and Matthew's file says he's blind. [GoddiMax: blocker if they're real] | **Max:** "they are 2 different people and MattKoch should probably be referred to as MattiMax." Real name replaced with Mattimax everywhere. |
 | 10 | **The build churns.** Zips change every run, there's no `--check` or `--help`, and the asset queue crashes without arguments. [Jerry, Henry, Randy] | Fixed zip timestamps, `--check` mode, usage messages |
 | 11 | **The front door has no focal point.** The README is 339 bytes. [Robert] | README becomes the stage: the band in one table, a 2-minute install, "say this to start". One combined zip option. |
 | 12 | **QA and Focus Group subagents inherit every tool.** [George] | Explicit `tools:` lines; no GitHub access for Bug Wrangler until Max says go |
@@ -43,7 +43,7 @@
 Windows `install.ps1`, uploading zips to Claude chat, any skill running in GPT or Gemini, GitHub push protection status, and whether QXT-RZN still exists.
 
 ## For Max
-1. Matt Koch and Matthew: real people? Public OK?
+1. ~~Real people?~~ Answered: the co-founder is now called Mattimax everywhere
 2. Which fixes to build, and in what order
 3. How much does access count in your projects?
 4. Where should DnD-Max QA reports live?

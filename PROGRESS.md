@@ -1,8 +1,50 @@
+# Status · 2026-10-15
+**Where we are:** The lineup is 13 skills and 23 subagents, reviewed by its own BVD (11 of 11 approve with changes), and every change the council asked for is in. It installs in Claude chat and Claude Code, and ChatGPT and Gemini now have a one-file paste-in kit (untested there yet).
+**Proven on a real job:** BVD, QA Team, Wrap, Translator, Scribe. **Tested on samples:** Key Keeper, Checkpoint, Asset Forge. **Built, not run:** Session Kickoff, Vision Keeper, Focus Group, Deploy Doctor, Handoff Packer.
+**Partial:** nothing has run in ChatGPT, Gemini or Visual Studio yet; the Windows installer hasn't run on Windows.
+**Next up:** install it for real (Claude chat zips + `install.ps1`); first Session Kickoff on a real project; Vision Keeper writes AgentMax's own VISION.md.
+**Waiting on Max:**
+- Turn on GitHub secret scanning + push protection for AgentMax and DnD-Max (Key Keeper SKILL.md has the steps). Owner: Max.
+- Merge the DnD-Max QA report branch `docs/agentmax-qa-2026-10-15`, and delete or keep test table QXT-RZN. Owner: Max, or a DnD-Max session.
+- Approve BVD personas v4.5-draft, or say what to change. Owner: Max.
+
 # Progress Log
 
 Newest on top. Each entry quotes the request that caused it.
-
 ---
+
+## 2026-10-15 · Built every fix from the BVD review
+
+> "Foundation (Recommended), Cross-tool kit, Less ceremony, Cleanup" · access: "Give it real weight" · reports: "In the DnD-Max repo" · names: "they are 2 diferent people and MattKoch should probably be referred to as MattiMax."
+
+**What changed**
+- **Foundation:**
+  - RULES.md now ships inside every skill.
+  - `tools/build.py` makes identical bytes every run, and has `--check` and `--help`.
+  - The status board is honest: Proven / Tested / Built, not run.
+  - Key Keeper closes every hole George and Henry found: renames, SCREAMING_CASE names, non-English file names, JWTs, Google/HF/Stripe keys, `.envrc`. The hook keeps existing hooks and survives the skill folder moving. GitHub push protection is now part of setup.
+  - Checkpoint rolls back in one step and one commit. Rehearsed with a merge commit: the old revert failed, the new one restored the files exactly.
+- **Cross-tool kit:**
+  - `snippets/AGENTS.md` in plain words.
+  - `dist/for-gpt-gemini/`: AGENTMAX-ALL.md (the whole lineup in one file) plus INSTRUCTIONS.txt for the instructions box.
+- **Less ceremony:**
+  - New **Wrap** skill: one readout at the end of every change.
+  - Session Kickoff is the front door and calls the rest of the crew.
+  - The CLAUDE.md snippet is trimmed to start, build, wrap, with light mode first.
+  - README is the stage.
+- **Cleanup:**
+  - DnD-Max QA report moved to the DnD-Max repo (branch `docs/agentmax-qa-2026-10-15`; not on main, which auto-deploys) and removed here.
+  - CLAUDE.md and AGENTS.md fence this repo to agent-building.
+  - Testers and QA roles can't edit files or use GitHub.
+  - Test-data cleanup is a rule.
+  - Asset queue: buttons named per asset for screen readers, "Next up" keeps the filter, reduced-motion, a "done ✓" moment.
+- **Access, real weight:** keyboard pass on every smoke test, an Access line in QA reports, a ninth tester (Lee, The Screen Reader User), and RULES.md #8a.
+- **Names:** Matt Koch is now Mattimax everywhere, Word doc included.
+
+**Not done / not tested**
+- Nothing has run in ChatGPT, Gemini, Visual Studio or real Windows yet.
+- Git history still contains the old real name from earlier commits. Only a history rewrite removes it, and that's Max's call.
+- No combined all-skills zip for Claude chat. I'm not sure Claude chat accepts more than one skill per zip, so it's one zip per skill.
 
 ## 2026-10-15 · BVD Full Council reviews the lineup: 11 of 11 approve with changes
 

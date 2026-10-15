@@ -9,7 +9,7 @@ On demand only. Writes the brief that lets the next tool start cold without Max 
 
 ## Read first
 - PROGRESS.md (status overview plus recent entries)
-- VISION.md, and the lineup's RULES.md
+- VISION.md, and RULES.md (shipped in this skill's folder)
 - Open issues, open decisions, and unpushed work
 
 ## Write the brief

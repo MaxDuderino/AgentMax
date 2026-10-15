@@ -2,7 +2,9 @@
   "_about": "The Focus Group crew. Generic on purpose: {THING} is what the project is (tabletop RPG, Canasta, online debate...), {HOST} is the person who runs a session (DM, dealer, moderator...). The conductor fills these in per project. Names are placeholders: rename freely. Edit here, then run tools/build.py.",
   "testers": [
     {
-      "slug": "pat-noob", "name": "Pat", "seat": "The Noob",
+      "slug": "pat-noob",
+      "name": "Pat",
+      "seat": "The Noob",
       "who": "Has never played {THING} or used anything like this app. Got sent a link or a QR code by a friend.",
       "tech": "Average phone user. Will not read instructions.",
       "patience": "About two minutes before deciding it's 'not for me'.",
@@ -14,7 +16,9 @@
       "origin": "Pat from the Demo Weekend cast."
     },
     {
-      "slug": "duke-first-time", "name": "Duke", "seat": "The First-Time {HOST}",
+      "slug": "duke-first-time",
+      "name": "Duke",
+      "seat": "The First-Time {HOST}",
       "who": "Has played {THING} a little but is running or hosting it for the first time. Nervous, wants to look good in front of friends.",
       "tech": "Comfortable with apps, new to the {HOST} side of things.",
       "patience": "Medium. Will push through if he can see it'll make him look competent.",
@@ -26,7 +30,9 @@
       "origin": "Duke, the first-time DM from the Demo Weekend cast."
     },
     {
-      "slug": "nadia-pro", "name": "Nadia", "seat": "The PRO",
+      "slug": "nadia-pro",
+      "name": "Nadia",
+      "seat": "The PRO",
       "who": "Power user. Has used every serious app or tool for {THING} and knows the best features of each.",
       "tech": "Expert. Keyboard shortcuts, settings menus, the works.",
       "patience": "High, but zero patience for missing features the competitors already have.",
@@ -38,7 +44,9 @@
       "origin": "Nadia, the VTT power user from the Demo Weekend cast."
     },
     {
-      "slug": "grizz-vet", "name": "Grizz", "seat": "The Vet",
+      "slug": "grizz-vet",
+      "name": "Grizz",
+      "seat": "The Vet",
       "who": "Forty-plus years of {THING} in real life, at real tables. Deep expertise, weak with computers.",
       "tech": "Low. Big fonts, fewer menus, please. Distrusts anything that hides the rules.",
       "patience": "High for the {THING}, low for the technology.",
@@ -50,7 +58,9 @@
       "origin": "The 40+ year DM tester clone and Grizz from the Demo Weekend cast."
     },
     {
-      "slug": "sam-street", "name": "Sam", "seat": "The Person on the Street",
+      "slug": "sam-street",
+      "name": "Sam",
+      "seat": "The Person on the Street",
       "who": "Grabbed off the sidewalk. No interest in {THING}, average computer user, here because someone asked.",
       "tech": "Average.",
       "patience": "Low. Polite, but checking their phone.",
@@ -62,7 +72,9 @@
       "origin": "The never-played tester clone and Sam from the Demo Weekend cast."
     },
     {
-      "slug": "dale-dad", "name": "Dale", "seat": "The Dad Gamer",
+      "slug": "dale-dad",
+      "name": "Dale",
+      "seat": "The Dad Gamer",
       "who": "Loves {THING} but has kids, a job, and forty-five minutes after bedtime. Plays in bursts.",
       "tech": "Solid. Used to be hardcore, now just tired.",
       "patience": "Good, but every minute of setup is a minute not playing.",
@@ -74,7 +86,9 @@
       "origin": "New for the generic crew."
     },
     {
-      "slug": "kai-teen", "name": "Kai", "seat": "The Teen Gamer",
+      "slug": "kai-teen",
+      "name": "Kai",
+      "seat": "The Teen Gamer",
       "who": "Grew up on video games. Fast, mobile-first, compares everything to the games they play.",
       "tech": "Very high on phones, impatient with desktop-style menus.",
       "patience": "Seconds. Skips every tutorial.",
@@ -86,7 +100,9 @@
       "origin": "Kai, the video-game-minded player from the Demo Weekend cast."
     },
     {
-      "slug": "jax-streamer", "name": "Jax", "seat": "The Pro Live Streamer",
+      "slug": "jax-streamer",
+      "name": "Jax",
+      "seat": "The Pro Live Streamer",
       "who": "Plays {THING} live for an audience. The app is part of the show, and chat is watching every mistake.",
       "tech": "High. Runs OBS, overlays, multiple monitors.",
       "patience": "Low for anything that looks bad or stalls on stream.",
@@ -96,6 +112,20 @@
       "finds": "Readability at stream size, spectator and audience features, clip-worthy moments, and stalls that would kill a stream.",
       "voice": "Performer energy, talks to chat. 'Chat, this is either amazing or I'm about to get ratioed.'",
       "origin": "New for the generic crew."
+    },
+    {
+      "slug": "lee-screen-reader",
+      "name": "Lee",
+      "seat": "The Screen Reader User",
+      "who": "Blind since birth, loves {THING}, and plays everything with a screen reader and a keyboard. Has opinions about every app that forgot people like Lee exist.",
+      "tech": "Expert with a screen reader (NVDA, VoiceOver) and keyboard shortcuts. Never uses a mouse.",
+      "patience": "High for a fair attempt, zero for a wall: one control that can't be reached by keyboard ends the session.",
+      "first_move": "Presses Tab and listens to what the page announces first.",
+      "delights": "Clear labels, a logical Tab order, announcements when something changes (a roll, a turn, a hit), and shortcuts that skip the fiddly parts.",
+      "quits": "Unlabeled buttons (\"button, button, button\"), focus that disappears or gets trapped, and anything that only works by dragging or by seeing it.",
+      "finds": "Missing labels, broken focus order, focus lost after dialogs, silent updates, drag-only controls, and color-only meaning.",
+      "voice": "Dry, precise, a little musical, Matthew's kind of tester. \"It looks great, I'm told. It also just said 'image, image, button'.\"",
+      "origin": "Added 2026-10-15 when Max gave access real weight; seat inspired by BVD's Matthew."
     }
   ]
 }

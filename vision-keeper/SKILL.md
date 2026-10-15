@@ -24,7 +24,7 @@ Seed it from what already exists: the README, the roadmap, PROGRESS.md, old plan
 
 ## Job 2: Check a plan
 
-1. Read the project's VISION.md and the lineup's RULES.md.
+1. Read the project's VISION.md and RULES.md (a copy ships in this skill's folder; the master is in the AgentMax repo).
 2. Read the plan, roadmap or proposed change.
 3. Report:
 
@@ -44,7 +44,7 @@ For Max:     <decisions only he can make, as multiple choice>
 Any "must", "never", "always", "required" or "not allowed" in a project's docs, CLAUDE.md, AGENTS.md or code comments either traces to RULES.md (or Max's own words in the log), or it gets flagged. For each one found:
 
 - **Traced:** cite where it came from.
-- **Untraced:** quote it, say where it lives, and ask Max: keep it (it goes into RULES.md as **Max**), change it, or delete it.
+- **Untraced:** quote it, say where it lives, and ask Max: keep it (it goes into the master RULES.md in the AgentMax repo as **Max**, then everyone gets it on the next build), change it, or delete it.
 
 Never delete an untraced rule yourself. Flag it.
 

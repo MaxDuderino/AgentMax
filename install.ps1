@@ -15,5 +15,5 @@ Get-ChildItem -Directory $here | Where-Object { Test-Path (Join-Path $_.FullName
   Write-Host "Skill installed: $($_.Name)"
 }
 Copy-Item -Force (Join-Path $here "claude-code\agents\*.md") $agents
-Write-Host "Subagents installed to $agents (11 BVD seats, 8 testers, 3 QA roles)"
+Write-Host "Subagents installed to $agents (11 BVD seats, 9 testers, 3 QA roles)"
 Write-Host "Restart Claude Code, then try: /session-kickoff or /bvd"

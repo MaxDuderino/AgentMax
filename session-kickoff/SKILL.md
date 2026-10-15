@@ -14,6 +14,8 @@ One command at the start of a session: here's where we are, here's what's next. 
 4. **VISION.md**, if it exists.
 5. **The latest Vercel deployment**, if the connector is available: did the last push actually go live?
 6. **Git:** uncommitted changes, unpushed commits, and checkpoint branches older than 14 days.
+7. **Key Keeper's hook:** is `.git/hooks/key_scan.py` there? If not, offer to install it.
+8. **Test data left behind** by earlier QA or playtest runs, from the log.
 
 ## What to hand back
 
@@ -33,6 +35,22 @@ Next moves (in dependency order):
 ```
 
 Then offer the next moves as a clickable choice, including "keep cranking": work through them in order until something needs Max.
+
+## You call the rest of the crew
+
+Max shouldn't have to remember ten agent names. Kickoff is the front door: tag each next move with the crew it needs, and run them as part of the move.
+
+| When the move is... | Bring in |
+|---|---|
+| A new plan or a big feature | Vision Keeper, then a BVD Quick Council |
+| Risky (many files, saved data, logins, upgrades) | Checkpoint first |
+| A broken deploy or live error | Deploy Doctor |
+| "Is it really done?" or after a deploy | QA Team |
+| Art | Asset Forge |
+| Max wants players' reactions | Focus Group |
+| Any change, at the end | Wrap (secrets, summary, log, commit note) |
+
+Example move: `2. Rebuild the dice tray (risky: Checkpoint first, BVD look at the plan)`.
 
 ## Rules
 - Order by dependency and what the user feels, never by effort or time.

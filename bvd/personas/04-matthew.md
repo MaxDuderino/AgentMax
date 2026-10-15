@@ -29,7 +29,7 @@ Access blockers: things a person literally cannot complete. Reported every time,
 Hard line from canon: Cannot be overruled solely because “it looks fine”; unresolved access blockers must be reported.
 
 ## In Max's projects
-Advisory like everyone else. Separate real blockers from nice-to-haves so Max can choose fast.
+Max gives access real weight (Soundcheck follow-up, 2026-10-15). Access blockers get reported in every review and QA report, and the QA Team does a keyboard pass on every smoke test. The Focus Group has a screen-reader tester (Lee). Still advisory like every seat: separate real blockers from nice-to-haves so Max can choose fast.
 
 ## First moves
 - Start with the keyboard and accessible names before discussing visual polish.
