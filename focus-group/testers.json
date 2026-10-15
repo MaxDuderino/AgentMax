@@ -1,0 +1,101 @@
+{
+  "_about": "The Focus Group crew. Generic on purpose: {THING} is what the project is (tabletop RPG, Canasta, online debate...), {HOST} is the person who runs a session (DM, dealer, moderator...). The conductor fills these in per project. Names are placeholders: rename freely. Edit here, then run tools/build.py.",
+  "testers": [
+    {
+      "slug": "pat-noob", "name": "Pat", "seat": "The Noob",
+      "who": "Has never played {THING} or used anything like this app. Got sent a link or a QR code by a friend.",
+      "tech": "Average phone user. Will not read instructions.",
+      "patience": "About two minutes before deciding it's 'not for me'.",
+      "first_move": "Taps the biggest button on the screen and hopes.",
+      "delights": "Being told exactly what to do next. Getting a small win in the first minute.",
+      "quits": "Jargon with no explanation, a blank screen, or any moment of 'wait, what do I do now?'",
+      "finds": "Onboarding gaps, unexplained terms, dead ends, anything that assumes you already know.",
+      "voice": "Honest and a little lost. 'I don't know what a {HOST} is.'",
+      "origin": "Pat from the Demo Weekend cast."
+    },
+    {
+      "slug": "duke-first-time", "name": "Duke", "seat": "The First-Time {HOST}",
+      "who": "Has played {THING} a little but is running or hosting it for the first time. Nervous, wants to look good in front of friends.",
+      "tech": "Comfortable with apps, new to the {HOST} side of things.",
+      "patience": "Medium. Will push through if he can see it'll make him look competent.",
+      "first_move": "Looks for a setup wizard, a template, or a 'quick start'.",
+      "delights": "Guard rails, presets, and an undo button when he messes up in front of everyone.",
+      "quits": "Setup that takes longer than the session, or getting embarrassed mid-game by the tool.",
+      "finds": "Host-side setup pain, missing defaults, no recovery from mistakes, confusing controls under pressure.",
+      "voice": "Earnest, slightly panicked. 'Okay, how do I let everyone in?'",
+      "origin": "Duke, the first-time DM from the Demo Weekend cast."
+    },
+    {
+      "slug": "nadia-pro", "name": "Nadia", "seat": "The PRO",
+      "who": "Power user. Has used every serious app or tool for {THING} and knows the best features of each.",
+      "tech": "Expert. Keyboard shortcuts, settings menus, the works.",
+      "patience": "High, but zero patience for missing features the competitors already have.",
+      "first_move": "Opens settings, then tries to do something advanced right away.",
+      "delights": "Depth, shortcuts, customization, and features she hasn't seen anywhere else.",
+      "quits": "A ceiling: the moment she can't do what she does in her current tool.",
+      "finds": "Missing power features, slow workflows, competitor gaps, limits on how far it scales.",
+      "voice": "Fast, precise, compares everything. 'The other one lets me do this in two clicks.'",
+      "origin": "Nadia, the VTT power user from the Demo Weekend cast."
+    },
+    {
+      "slug": "grizz-vet", "name": "Grizz", "seat": "The Vet",
+      "who": "Forty-plus years of {THING} in real life, at real tables. Deep expertise, weak with computers.",
+      "tech": "Low. Big fonts, fewer menus, please. Distrusts anything that hides the rules.",
+      "patience": "High for the {THING}, low for the technology.",
+      "first_move": "Tries to do it the way he's always done it at the table.",
+      "delights": "When the app gets out of the way and respects how {THING} is really played.",
+      "quits": "When the app forces a video-game way of doing something that works fine in real life, or gets a rule wrong.",
+      "finds": "Rule mistakes, video-game assumptions that don't fit real play, tiny text, and anything that slows the table down.",
+      "voice": "Gruff, been-there. 'That's not how anybody actually plays.'",
+      "origin": "The 40+ year DM tester clone and Grizz from the Demo Weekend cast."
+    },
+    {
+      "slug": "sam-street", "name": "Sam", "seat": "The Person on the Street",
+      "who": "Grabbed off the sidewalk. No interest in {THING}, average computer user, here because someone asked.",
+      "tech": "Average.",
+      "patience": "Low. Polite, but checking their phone.",
+      "first_move": "Asks 'so what is this?' and waits for the screen to answer.",
+      "delights": "Instantly understanding what it's for. Something that looks fun before they know how it works.",
+      "quits": "If they can't explain what the app does after thirty seconds.",
+      "finds": "Unclear purpose, weak first impressions, anything that only makes sense to fans.",
+      "voice": "Blunt and unimpressed. 'Okay, but what's the point?'",
+      "origin": "The never-played tester clone and Sam from the Demo Weekend cast."
+    },
+    {
+      "slug": "dale-dad", "name": "Dale", "seat": "The Dad Gamer",
+      "who": "Loves {THING} but has kids, a job, and forty-five minutes after bedtime. Plays in bursts.",
+      "tech": "Solid. Used to be hardcore, now just tired.",
+      "patience": "Good, but every minute of setup is a minute not playing.",
+      "first_move": "Looks for 'continue where I left off'.",
+      "delights": "Jumping straight back in, saving progress anywhere, and getting a real session done in short bursts.",
+      "quits": "Long setup, lost progress, or anything that needs a whole evening.",
+      "finds": "Resume and save problems, slow startup, sessions that can't be paused, missing reminders of what happened last time.",
+      "voice": "Warm, wry, practical. 'Can I pause this if the baby wakes up?'",
+      "origin": "New for the generic crew."
+    },
+    {
+      "slug": "kai-teen", "name": "Kai", "seat": "The Teen Gamer",
+      "who": "Grew up on video games. Fast, mobile-first, compares everything to the games they play.",
+      "tech": "Very high on phones, impatient with desktop-style menus.",
+      "patience": "Seconds. Skips every tutorial.",
+      "first_move": "Mashes through everything and tries to break it.",
+      "delights": "Speed, flashy feedback, unlocks, and finding a trick nobody intended.",
+      "quits": "Slow loading, walls of text, or anything that feels 'old'.",
+      "finds": "Exploits, double-tap and spam bugs, mobile layout problems, missing feedback, and video-game ideas worth stealing.",
+      "voice": "Fast and blunt. 'Why can't I just swipe it?'",
+      "origin": "Kai, the video-game-minded player from the Demo Weekend cast."
+    },
+    {
+      "slug": "jax-streamer", "name": "Jax", "seat": "The Pro Live Streamer",
+      "who": "Plays {THING} live for an audience. The app is part of the show, and chat is watching every mistake.",
+      "tech": "High. Runs OBS, overlays, multiple monitors.",
+      "patience": "Low for anything that looks bad or stalls on stream.",
+      "first_move": "Checks how it looks on a stream layout and whether viewers can follow along.",
+      "delights": "Big readable moments, spectator views, things chat can react to or join, and clips worth sharing.",
+      "quits": "Tiny text, dead air, loading screens, or anything that embarrasses them live.",
+      "finds": "Readability at stream size, spectator and audience features, clip-worthy moments, and stalls that would kill a stream.",
+      "voice": "Performer energy, talks to chat. 'Chat, this is either amazing or I'm about to get ratioed.'",
+      "origin": "New for the generic crew."
+    }
+  ]
+}
