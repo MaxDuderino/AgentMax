@@ -1,0 +1,13 @@
+{
+  "project": "Example Project",
+  "style": "assets/STYLE.md",
+  "assets": [
+    {"id": "token-goblin-01", "family": "Tokens", "name": "Goblin skirmisher token (example)", "file": "public/tokens/goblin-skirmisher.png", "shape": "square",
+     "prompt": "A wiry goblin skirmisher crouched with a jagged short sword, seen from a top-down 3/4 angle, centered. Hand-inked fantasy illustration, warm candlelit palette, bold readable silhouette, clean outline. Square image, transparent background, no text.",
+     "variants": ["Same goblin skirmisher, mid-leap, sword raised. Hand-inked fantasy illustration, warm candlelit palette, bold readable silhouette. Square, transparent background, no text."],
+     "status": "todo", "notes": ""},
+    {"id": "icon-d20-01", "family": "Icons", "name": "d20 roll icon (example)", "file": "public/icons/d20.png", "shape": "square",
+     "prompt": "A single twenty-sided die with the 20 facing up, centered, simple shapes. Hand-inked fantasy illustration, warm candlelit palette, thick clean outline, readable at 24 pixels. Square image, transparent background, no text other than the number.",
+     "variants": [], "status": "done", "notes": ""}
+  ]
+}

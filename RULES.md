@@ -68,6 +68,11 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 - QA Team: Henry leads; Smoke Tester, Bug Wrangler and Hollow-Feature Audit. **Max**
 - Focus Group tester names (Pat, Duke, Nadia, Grizz, Sam, Dale, Kai, Jax) are placeholders, partly reused from the Demo Weekend cast. **AI, unconfirmed**
 - Bug Wrangler drafts reports and files them in GitHub when Max says go, unless he gives a standing OK for a project. **AI, unconfirmed**
+- Deploy Doctor diagnoses and proposes fixes. Rollbacks, redeploys and setting changes need Max's OK each time. **Max**
+- Asset Forge works for manual ChatGPT use, one prompt at a time, no APIs. **Max**
+- Checkpoints get cleaned up once the risk has passed. **Max**
+- Handoff Packer runs on demand only. **Max**
+- Checkpoint branches older than 14 days get flagged for cleanup; Key Keeper blocks a commit when it finds a secret. **AI, unconfirmed**
 - Table Check (video-game vs tabletop) is DnD-Max only. Not part of the general lineup. **Max**
 - Every project gets a VISION.md for Vision Keeper to check against. **Max**
 - The lineup lives in its own public GitHub repo (MaxDuderino/AgentMax) that every project points to, and must work in Claude chat, Claude Code, GPT, Gemini / AI Studio and Visual Studio AI. **Max**

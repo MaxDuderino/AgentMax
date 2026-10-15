@@ -8,4 +8,7 @@ This project uses Max's Agent Lineup: https://github.com/MaxDuderino/AgentMax
 - "Keep cranking" means work through the next unblocked items until something needs Max's decision.
 - No hollow features: done means a user can finish the whole thing.
 - Run plans and big changes past the BVD (`/bvd`). Quick Council by default; Full Council when Max asks.
-- This project's vision lives in VISION.md.
+- Start sessions with `/session-kickoff`. Make a `/checkpoint` before risky changes. Run `/key-keeper` before every commit.
+- After a change: `/translator` for a plain-English summary, `/scribe` for the log and commit notes.
+- After a deploy: `/qa-team`. If it broke: `/deploy-doctor`.
+- This project's vision lives in VISION.md. `/vision-keeper` writes it if it's missing and checks plans against it.

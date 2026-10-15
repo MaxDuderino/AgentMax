@@ -12,16 +12,16 @@ Max's crew of AI agents. Plain markdown, so any AI can read it: Claude, Claude C
 | **BVD** | 11-persona review council | Running a plan, design or change past the team | ✅ Built (v4.5-draft) |
 | **Focus Group** | 8 generic testers play any app or game | Only when Max asks for a playtest | ✅ Built |
 | **QA Team** | Henry + Smoke Tester, Bug Wrangler, Hollow-Feature Audit | After a deploy, something broke, or "is it really done?" | ✅ Built |
-| **Scribe** | Progress log, overviews, commit notes | Every change. Always on | 📋 Queued, build now |
-| **Vision Keeper** | Checks plans against VISION.md and RULES.md | Phase boundaries and new plans | 📋 Queued, build now |
-| **Asset Forge** | Batch art prompts, copy-ready for GPT, one at a time | Making game art | 📋 Queued, build now |
-| **Deploy Doctor** | Reads Vercel logs, diagnoses, proposes the fix | A deploy breaks | 📋 Queued, build now |
-| **Checkpoint** | Restore point before risky work, cleanup after | Before big or risky changes | 📋 Queued |
-| **Translator** | Plain-English "what changed, why, what might break" | After a change | 📋 Queued |
-| **Session Kickoff** | Reads log, roadmap, issues; where we are + next moves | Start of a session | 📋 Queued |
-| **Rule Ledger** | Keeps RULES.md honest, with sources | Any new rule | ✅ Started (RULES.md) |
-| **Key Keeper** | No secrets land in a repo | Before each push | 📋 Queued |
-| **Handoff Packer** | Writes a cross-tool brief | Only when Max asks | 🤷 Maybe, on demand |
+| **Scribe** | Progress log, overviews, commit notes | Every change. Always on | ✅ Built |
+| **Vision Keeper** | Writes VISION.md with Max; checks plans against it and RULES.md; hunts AI-invented rules | Phase boundaries and new plans | ✅ Built |
+| **Asset Forge** | Style bible, batch prompts, clickable copy-paste queue for ChatGPT | Making game or app art | ✅ Built |
+| **Deploy Doctor** | Reads Vercel logs, diagnoses, proposes the fix (never acts alone) | A deploy breaks | ✅ Built |
+| **Checkpoint** | Restore point before risky work, one-phrase rollback, cleanup after | Before big or risky changes | ✅ Built |
+| **Translator** | Plain-English "what changed, why, what might break" | After a change | ✅ Built |
+| **Session Kickoff** | Reads log, roadmap, issues, deploy; where we are + next moves | Start of a session | ✅ Built |
+| **Rule Ledger** | RULES.md, every rule with its source; Vision Keeper enforces it | Any new rule | ✅ Built |
+| **Key Keeper** | Secret scanner + automatic pre-commit check | Before every commit and push | ✅ Built |
+| **Handoff Packer** | Writes a cross-tool HANDOFF.md | Only when Max asks | ✅ Built (on demand) |
 | ~~Table Check~~ | Video-game vs tabletop | DnD-Max only, lives in that repo | ✂️ Not in this lineup |
 
 ## The BVD
@@ -67,12 +67,21 @@ Folder: `qa-team/`. Henry leads. Smoke Tester after deploys, Bug Wrangler for br
 
 ## Using it in each tool
 
-**Claude chat (claude.ai):** upload `bvd-skill.zip`, `focus-group-skill.zip` and `qa-team-skill.zip` as skills once. They're then available in every chat and project. Say "run it past the BVD", "playtest this" or "QA the site", or type `/bvd`, `/focus-group`, `/qa-team`.
+**Claude chat (claude.ai):** upload the zips in `dist/` as skills once (one per agent). They're then available in every chat and project. Talk normally ("run it past the BVD", "catch me up", "QA the site") or type the slash name, like `/bvd` or `/session-kickoff`.
 
-**Claude Code:** run the installer once (`install.ps1` on Windows, `install.sh` on Mac/Linux). It copies the three skills to your personal skills and all 22 subagents (11 BVD seats, 8 testers, 3 QA roles) to your personal agents, so they work in every repo. Then each project's CLAUDE.md gets the snippet in `snippets/CLAUDE-AGENTS.md`.
+**Claude Code:** run the installer once (`install.ps1` on Windows, `install.sh` on Mac/Linux). It copies every skill to your personal skills and all 22 subagents (11 BVD seats, 8 testers, 3 QA roles) to your personal agents, so they work in every repo. Then each project's CLAUDE.md gets the snippet in `snippets/CLAUDE-AGENTS.md`.
 
 **GPT, Gemini, AI Studio, Visual Studio:** they don't load Claude skills. Hand them `LINEUP.md`, `RULES.md`, `bvd/SKILL.md` and the persona files, or point an AGENTS.md at this repo with the same snippet.
 
+## A normal session, with the whole crew
+
+1. **Session Kickoff**: where we are, what's next.
+2. **Vision Keeper** checks the plan. **BVD** reviews big decisions.
+3. **Checkpoint** before anything risky. Build. **Key Keeper** before each commit.
+4. **Translator** explains the change. **Scribe** logs it and writes commit notes.
+5. After the deploy: **QA Team** smoke test. **Deploy Doctor** if it broke. **Checkpoint** cleanup once it's good.
+6. **Focus Group** and **Asset Forge** whenever Max calls them.
+
 ## Adding or changing a persona
 
-BVD: edit `tools/personas_v45_additions.json` (or the v4.4a source JSON for canon). Focus Group: edit `focus-group/testers.json`. QA: edit the files in `qa-team/roles/`. Then run `python tools/build.py`. It regenerates the persona files and the Claude Code wrappers so they never drift apart.
+BVD: edit `tools/personas_v45_additions.json` (or the v4.4a source JSON for canon). Focus Group: edit `focus-group/testers.json`. QA: edit the files in `qa-team/roles/`. Then run `python tools/build.py`. It regenerates the persona files, the Claude Code wrappers and the skill zips in `dist/` so nothing drifts apart.

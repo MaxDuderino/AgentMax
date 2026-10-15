@@ -213,3 +213,19 @@ for i, t in enumerate(fg["testers"], 1):
     (ROOT / f"claude-code/agents/fg-{t['slug']}.md").write_text(
         FG_WRAP.format(slug=t["slug"], name=t["name"], seat=t["seat"], body=body), encoding="utf-8")
 print("built", len(fg["testers"]), "Focus Group testers:", ", ".join(t["name"] for t in fg["testers"]))
+
+# ------------------------------------------------- Skill zips for Claude chat
+# One zip per skill folder, ready to upload as a skill in Claude chat.
+import zipfile
+
+dist = ROOT / "dist"
+dist.mkdir(exist_ok=True)
+zips = []
+for d in sorted(p for p in ROOT.iterdir() if (p / "SKILL.md").exists()):
+    zp = dist / f"{d.name}.zip"
+    with zipfile.ZipFile(zp, "w", zipfile.ZIP_DEFLATED) as z:
+        for f in sorted(d.rglob("*")):
+            if f.is_file() and f.suffix != ".docx" and "__pycache__" not in f.parts:
+                z.write(f, f.relative_to(ROOT).as_posix())
+    zips.append(d.name)
+print("zipped", len(zips), "skills into dist/:", ", ".join(zips))

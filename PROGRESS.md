@@ -4,6 +4,31 @@ Newest on top. Each entry quotes the request that caused it.
 
 ---
 
+## 2026-10-15 · Road crew and bonus tracks built: 9 more agents
+
+> "make it so"
+
+**What changed**
+- **Scribe:** log entry, light-mode entry, status overview and commit-note formats. PROGRESS.md is the source of truth, with a Claude Doc mirror.
+- **Vision Keeper:** writes VISION.md with Max (template included), checks plans for drift, dropped and shrunk features and hollow risk, and hunts untraced "must/never" rules.
+- **Asset Forge:** style bible template, prompts.json format, and `build_queue.py`, which builds a clickable asset-prompts.html. One-click copy, a "Next up" button, done/redo/skip marks, and a "Copy status update" to paste back. Built for manual ChatGPT use. Example included.
+- **Deploy Doctor:** Vercel logs → observed vs suspected → proposed fix. Never rolls back or redeploys on its own.
+- **Checkpoint:** pushed restore-point branches, a one-phrase rollback, and cleanup once the risk passes.
+- **Translator:** plain-English change reports for an IT brain, no code dumps.
+- **Session Kickoff:** reads the log, issues, roadmap, vision, deploy and git state, then offers clickable next moves.
+- **Key Keeper:** `key_scan.py` secret scanner plus an automatic pre-commit hook. Tested: it blocked a fake Anthropic key, a fake Google key and a .env file, and let clean commits through.
+- **Handoff Packer:** on-demand HANDOFF.md brief.
+- Installers now pick up every skill folder automatically (12 skills, 22 subagents). `tools/build.py` also builds skill zips into `dist/` for Claude chat.
+
+**Fixed along the way**
+- The first Key Keeper hook ran the scan twice when it found a secret. Fixed and retested.
+
+**Not done / not tested**
+- None of the new skills have run on a real project yet, except Key Keeper's scanner.
+- The asset queue page was syntax-checked but not opened in a browser.
+
+---
+
 ## 2026-10-15 · Focus Group and QA Team built, pushed to AgentMax
 
 > "they need to be a bit more generic so lets expand it, to test any app or game so "vet" in whatever the applicable app or game is a better specialty. something like: noob, first time %whatever%, PRO %whatever%, Vet %Whatever, Person on the street, Dad Gamer, teenager gamer, and pro live streamer."
