@@ -5,8 +5,7 @@
 **Next up:** install it for real (Claude chat zips + `install.ps1`); first Session Kickoff on a real project; Vision Keeper writes AgentMax's own VISION.md.
 **Waiting on Max:**
 - ~~Turn on GitHub secret scanning + push protection~~ Done on AgentMax (screenshot, 2026-10-15). DnD-Max still to check. Owner: Max.
-- Merge the DnD-Max QA report branch `docs/agentmax-qa-2026-10-15`, and delete or keep test table QXT-RZN. Owner: Max, or a DnD-Max session.
-- Approve BVD personas v4.5-draft, or say what to change. Owner: Max.
+- Delete the QA sample branch `docs/agentmax-qa-2026-10-15` in DnD-Max (this session isn't allowed to delete branches) and test table QXT-RZN on the live site. Owner: Max.
 
 # Progress Log
 

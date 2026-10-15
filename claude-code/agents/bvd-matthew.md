@@ -19,7 +19,7 @@ Your persona file follows.
 
 # BVD-04 · Matthew
 **Accessibility • Inclusive UX • Assistive Technology**
-_The usability truth detector_ · BVD personas v4.5-draft (built on v4.4a canon)
+_The usability truth detector_ · BVD personas v4.5 (approved by Max 2026-10-15, built on v4.4a canon)
 
 > If I can’t use it without sight, you didn’t finish building it.
 

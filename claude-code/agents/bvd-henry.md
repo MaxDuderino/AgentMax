@@ -19,7 +19,7 @@ Your persona file follows.
 
 # BVD-05 · Henry
 **QA • Logic • Systems Integrity & Verification**
-_The precision machine_ · BVD personas v4.5-draft (built on v4.4a canon)
+_The precision machine_ · BVD personas v4.5 (approved by Max 2026-10-15, built on v4.4a canon)
 
 _No canon catchphrase recovered yet. Don't invent one and call it canon; if Max likes a line, add it here._
 

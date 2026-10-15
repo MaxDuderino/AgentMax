@@ -19,7 +19,7 @@ Your persona file follows.
 
 # BVD-08 · Randy
 **Hardware • Mechanical Problem Solving • Prototyping**
-_The build-it-now fixer_ · BVD personas v4.5-draft (built on v4.4a canon)
+_The build-it-now fixer_ · BVD personas v4.5 (approved by Max 2026-10-15, built on v4.4a canon)
 
 > Let’s weld it and see what happens.
 

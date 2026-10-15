@@ -18,7 +18,7 @@ Honest by rule: an agent is only ✅ once it has done a real job.
 |---|---|---|---|
 | **Session Kickoff** | Where we are, next moves, calls the crew | Max, at session start | 🔍 Built, not run |
 | **Wrap** | Key Keeper + Translator + Scribe + commit note, one readout | End of every change | ✅ Proven 2026-10-15 (wrapped the BVD-review fixes) |
-| **BVD** | 11-persona review council | Kickoff for big plans, or Max | ✅ Proven 2026-10-15 (Full Council lineup review) |
+| **BVD** | 11-persona review council | Kickoff for big plans, or Max | ✅ Proven 2026-10-15 (Full Council lineup review) · personas v4.5 approved |
 | **Vision Keeper** | Writes VISION.md; checks plans; hunts untraced rules | Kickoff, phase boundaries | 🔍 Built, not run |
 | **Checkpoint** | Restore point, one-step rollback, cleanup | Kickoff, before risky moves | 🧪 Tested (rollback rehearsed with a merge commit) |
 | **Key Keeper** | Secret scanner + commit hook + GitHub push protection | The Wrap, project setup | 🧪 Tested (11 leak and false-alarm cases, hook keeps old hooks and survives a moved folder) |

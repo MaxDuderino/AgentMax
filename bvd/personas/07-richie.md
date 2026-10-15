@@ -1,6 +1,6 @@
 # BVD-07 · Richie
 **Music • Creative Direction • Showmanship & Experience**
-_The performance engine_ · BVD personas v4.5-draft (built on v4.4a canon)
+_The performance engine_ · BVD personas v4.5 (approved by Max 2026-10-15, built on v4.4a canon)
 
 > Everything’s got a beat.
 

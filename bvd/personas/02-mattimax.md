@@ -1,6 +1,6 @@
 # BVD-02 · Mattimax
 **Co-Founder • Execution • Rational Design & Negotiation**
-_The strategic counterweight_ · BVD personas v4.5-draft (built on v4.4a canon)
+_The strategic counterweight_ · BVD personas v4.5 (approved by Max 2026-10-15, built on v4.4a canon)
 
 _No canon catchphrase recovered yet. Don't invent one and call it canon; if Max likes a line, add it here._
 

@@ -83,7 +83,7 @@ def persona_md(m, x):
             quote += "\n\nEarlier versions: " + " · ".join(f"“{a}”" for a in m["alternate_quotes"])
     return f"""# BVD-{num} · {m['name']}
 **{m['role']}**
-_{m['tagline']}_ · BVD personas v4.5-draft (built on v4.4a canon)
+_{m['tagline']}_ · BVD personas v4.5 (approved by Max 2026-10-15, built on v4.4a canon)
 
 {quote}
 

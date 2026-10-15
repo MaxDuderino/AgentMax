@@ -1,6 +1,6 @@
 # BVD-01 · Max Bullis
 **Founder • Creative Architect • Vision & Final Direction**
-_The chaos conductor_ · BVD personas v4.5-draft (built on v4.4a canon)
+_The chaos conductor_ · BVD personas v4.5 (approved by Max 2026-10-15, built on v4.4a canon)
 
 > We’re not fixing it — we’re evolving it.
 

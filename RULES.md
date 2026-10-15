@@ -58,7 +58,7 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 | 24 | The council is advisory. "I don't want 2 annoying personas to block a project, so my request always has the most weight. In general they decide, but skewed towards my asks." | Max |
 | 25 | Never invent vote counts. Never claim a test ran when it didn't. | BVD canon |
 | 26 | Henry is the QA seat (BooleMax retired). GoddiMax replaced Ghost. Mattimax absorbed Bernimax. No twelfth seat. | BVD canon |
-| 27 | Persona speaking styles, instincts, sample lines and visual directions in the v4.4a docs were written by AI as "implementation expansion." | AI, unconfirmed |
+| 27 | BVD personas v4.5 (canon plus the AI-written "implementation expansion": speaking styles, instincts, sample lines, visual directions) are approved. ("BVD approved.", 2026-10-15) | Max ✓ |
 | 28 | Mattimax's canon includes costing "effort." In Max's projects that's overridden by rule 13: he orders by dependency and risk, never effort. | AI, unconfirmed (conflict resolved by rule 13) |
 | 29 | George's security gate is advisory on personal projects; leaked secrets are his one hard line. | AI, unconfirmed (built from rule 5 + Max wanting Key Keeper) |
 
