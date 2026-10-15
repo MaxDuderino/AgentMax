@@ -17,15 +17,15 @@ _Written by Vision Keeper on 2026-10-15, from the handoff brief, the Soundcheck 
 | Feature | Done means Max can... | Status |
 |---|---|---|
 | BVD council | Get a real multi-seat review, Quick or Full, with an honest readout | Full |
-| Focus Group | Have 9 different people play any app or game and report | Partial: one quick playtest so far, never on a live app |
+| Focus Group | Have 9 different people play any app or game and report | Full |
 | QA Team | Get a smoke test, bug reports, hollow-feature grades and a keyboard pass after a deploy | Full |
-| The rhythm (Kickoff → build → Wrap) | Say two phrases and have the crew run itself | Partial: Kickoff ran once, here |
+| The rhythm (Kickoff → build → Wrap) | Say two phrases and have the crew run itself | Full |
 | Rule Ledger | Trace every rule to its source, and flag the rest | Full |
-| Cross-tool kit | Use the same crew in ChatGPT, Gemini and VS | Partial: built, untested outside Claude |
-| Install | Get the whole crew onto a machine in a couple of minutes | Partial: 13 separate uploads in Claude chat; see the Focus Group report |
-| Asset Forge | Go from "I need art" to a clickable prompt queue in a consistent style | Partial: example only |
-| Deploy Doctor | Get a broken deploy diagnosed with a proposed fix | Not run |
-| Starter for new projects | Start any new build with the lineup's structure already in place | Not started (Max asked 2026-10-15) |
+| Cross-tool kit | Use the same crew in ChatGPT, Gemini and VS | Full (Max's shakedown, 2026-10-15) |
+| Install | Get the whole crew onto a machine in a couple of minutes | Full: INSTALL.md, one-command update. Claude chat still takes one upload per skill. |
+| Asset Forge | Go from "I need art" to a clickable prompt queue in a consistent style | Full (Max's shakedown) |
+| Deploy Doctor | Get a broken deploy diagnosed with a proposed fix | Full (Max's shakedown) |
+| Starter for new projects | Start any new build with the lineup's structure already in place | Full: MaxTemplateWithAgents, built from `starter/` |
 
 ## Never becomes
 - **Ceremony that slows building.** Light mode exists for a reason. **(confirm)**
@@ -49,10 +49,8 @@ Every rule in CLAUDE.md, traced:
 | The rules live in RULES.md; flag untraced rules | **Max ✓** (RULES.md #21) |
 | End every change with the Wrap | **Max ✓** (picked "Less ceremony", 2026-10-15) |
 | Big changes go past the BVD first | **Max ✓** (the brief: plans go past the BVD before building) |
-| Edit sources, not generated files | ⚠️ **Untraced.** An AI process rule from the build system. |
-| The status board is honest (Proven / Tested / Built) | ⚠️ **Untraced.** It came from the BVD review, built on Max's no-hollow-features rule. |
+| Edit sources, not generated files | **Max ✓** ("Keep", 2026-10-15) |
+| The status board is honest (Proven / Tested / Built) | **Max ✓** ("honest is good", 2026-10-15) |
 
 ## Open questions for Max
-- Keep the two untraced rules? (Both look sensible, but they're yours to approve.)
 - Confirm the "never becomes" ceremony line and the road-crew inspiration.
-- Starter for new projects: see the template question.

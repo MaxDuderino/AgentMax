@@ -4,7 +4,7 @@ Max's crew of AI agents. Plain markdown, so any AI can read it. Start with READM
 
 **House rules:** RULES.md (a copy ships inside every skill). **Log:** PROGRESS.md, newest on top.
 
-## Status board
+## Status board · v1.0 (2026-10-15)
 
 Honest by rule: an agent is only ✅ once it has done a real job.
 
@@ -23,12 +23,14 @@ Honest by rule: an agent is only ✅ once it has done a real job.
 | **Checkpoint** | Restore point, one-step rollback, cleanup | Kickoff, before risky moves | ✅ Proven 2026-10-15 (checkpoint + cleanup on AgentMax; rollback rehearsed with a merge commit) |
 | **Key Keeper** | Secret scanner + commit hook + GitHub push protection | The Wrap, project setup | ✅ Proven 2026-10-15 (hook guards AgentMax's real commits; push protection on) |
 | **QA Team** | Henry + Smoke Tester, Bug Wrangler, Hollow-Feature Audit | After deploys, "is it done?" | ✅ Proven 2026-10-15 (DnD-Max live play-through) |
-| **Focus Group** | 9 generic testers for any app or game | Only when Max asks | ✅ Proven 2026-10-15 (Quick Playtest of AgentMax's install) · live-app run pending |
-| **Deploy Doctor** | Vercel logs → diagnosis → proposed fix | A deploy breaks | 🔍 Built, not run · on Max's shakedown list |
-| **Asset Forge** | Style bible, prompts, clickable copy queue | Art requests | 🧪 Tested (example queue) · real run on Max's shakedown list |
+| **Focus Group** | 9 generic testers for any app or game | Only when Max asks | ✅ Proven 2026-10-15 (AgentMax install playtest; live-app run signed off by Max) |
+| **Deploy Doctor** | Vercel logs → diagnosis → proposed fix | A deploy breaks | ✅ Proven 2026-10-15 (Max's shakedown sign-off) |
+| **Asset Forge** | Style bible, prompts, clickable copy queue | Art requests | ✅ Proven 2026-10-15 (Max's shakedown sign-off) |
 | **Translator** | Plain-English change report | Inside the Wrap; on request | ✅ Proven 2026-10-15 (inside the Wrap) |
 | **Scribe** | Log entries, status overview, commit notes | Inside the Wrap; on request | ✅ Proven 2026-10-15 (inside the Wrap) |
 | **Handoff Packer** | Cross-tool HANDOFF.md | Only when Max asks | ✅ Proven 2026-10-15 (AgentMax HANDOFF.md) |
+
+**Works in (Max's shakedown, 2026-10-15):** Claude chat ✅ · Claude Code on Windows ✅ · ChatGPT ✅ · Gemini ✅ · Visual Studio ✅
 
 **Not agents:** the Rule Ledger is RULES.md itself, and Vision Keeper enforces it. ~~Table Check~~ lives in DnD-Max only.
 
@@ -76,7 +78,13 @@ Folder `focus-group/`. Generic for any app or game: `{THING}` and `{HOST}` are f
 | Jax | The Pro Live Streamer |
 | Lee | The Screen Reader User |
 
+## New projects
+
+Start from the GitHub template **MaxTemplateWithAgents** ("Use this template"), then say "catch me up". The template's files come from `starter/` here, built from the same snippets, so they never go stale. To refresh the template after a lineup update, copy `starter/` into it.
+
 ## Using it in each tool
+
+Step-by-step: **INSTALL.md**. Every command on one page: **COMMANDS.md**. Updating: run `update.ps1` (or `update.sh`).
 
 **Claude chat:** upload each zip in `dist/` as a skill once. Talk normally ("catch me up", "wrap it") or type the slash name.
 

@@ -1,15 +1,33 @@
-# Status · 2026-10-15
-**Where we are:** The lineup is 13 skills and 23 subagents, reviewed by its own BVD (11 of 11 approve with changes), and every change the council asked for is in. It installs in Claude chat and Claude Code, and ChatGPT and Gemini now have a one-file paste-in kit (untested there yet).
-**Proven on a real job:** 11 of 13: BVD, QA Team, Wrap, Translator, Scribe, Key Keeper, Checkpoint, Session Kickoff, Vision Keeper, Focus Group, Handoff Packer. **Tested on samples:** Asset Forge. **Built, not run:** Deploy Doctor. BVD personas v4.5 approved.
-**Partial:** nothing has run in ChatGPT, Gemini or Visual Studio yet; the Windows installer hasn't run on Windows.
-**Next up:** Max's v1.0 Shakedown checklist (Claude chat, Windows, ChatGPT, Gemini, VS, Deploy Doctor, Asset Forge, a live playtest), then tag v1.0. Focus Group says the install has too many steps: an INSTALL.md and an update script are the top asks.
+# Status · 2026-10-15 · v1.0
+**Where we are:** **AgentMax v1.0.** 13 agents, all ✅ proven: 11 on real jobs in this session, plus Asset Forge and Deploy Doctor on Max's shakedown sign-off. It works in Claude chat, Claude Code (Windows), ChatGPT, Gemini and Visual Studio (Max's shakedown). New builds start from the MaxTemplateWithAgents template.
+**Next up:** use it. Add agents only when a real project needs one, and they go past the BVD first.
 **Waiting on Max:**
-- ~~Turn on GitHub secret scanning + push protection~~ Done on AgentMax (screenshot, 2026-10-15). DnD-Max still to check. Owner: Max.
-- Delete the QA sample branch `docs/agentmax-qa-2026-10-15` in DnD-Max (this session isn't allowed to delete branches) and test table QXT-RZN on the live site. Owner: Max.
+- Mark MaxTemplateWithAgents as a template on GitHub (Settings → tick "Template repository").
+- Delete the QA sample branch `docs/agentmax-qa-2026-10-15` in DnD-Max (GitHub → Branches → trash icon) and test table QXT-RZN on the live site.
+- Check push protection on DnD-Max.
 
 # Progress Log
 
 Newest on top. Each entry quotes the request that caused it.
+
+---
+
+## 2026-10-15 · v1.0: template, install guide, update script, cheat sheet
+
+> "https://github.com/MaxDuderino/MaxTemplateWithAgents ill mark that as a template once complete" · "INSTALL.md for Grizz, Update script, Slash-command cheat sheet" · "Keep 'edit sources, not generated files', all passed the shakedown so i think honest is good go mark done."
+
+**What changed**
+- **MaxTemplateWithAgents filled:** README with the first five minutes, CLAUDE.md and AGENTS.md (lineup snippets), VISION.md, PROGRESS.md, `docs/testing/`, a secrets-proof `.gitignore`, `.env.example`. The source lives in AgentMax's `starter/`, generated from the same snippets, so the template can't drift.
+- **INSTALL.md:** step by step for Claude chat, Claude Code (Windows, Mac/Linux), ChatGPT, Gemini and VS, plus updating and removing. Claude chat steps checked against Claude's help center.
+- **update.ps1 / update.sh:** pull the latest and reinstall in one go. Tested: it pulled two new versions, listed what changed and reinstalled; a ZIP-download copy gets a clear message instead of an error.
+- **COMMANDS.md:** every slash command and phrase on one page, also inside the GPT/Gemini kit.
+- **Rules:** "edit sources, not generated files" and "honest status board" are now Max ✓.
+- **Shakedown:** all 8 of Max's checks marked passed. The board records Asset Forge and Deploy Doctor as proven on Max's sign-off.
+- **Tagged v1.0.**
+
+**Not done / not tested**
+- I didn't watch Max's 8 shakedown checks run; they're recorded as his sign-off.
+- Claude chat still needs one upload per skill: as far as Claude's help center says, a zip holds one skill.
 
 ---
 

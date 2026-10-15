@@ -27,7 +27,11 @@ That's Session Kickoff. It reads where the project stands, offers the next moves
 
 The full sheet, with what's proven and what isn't yet, is in **LINEUP.md**. The house rules, each with its source, are in **RULES.md**.
 
-## Install in two minutes
+## Install
+
+Step by step, for every tool: **INSTALL.md**. Every command on one page: **COMMANDS.md**. To update later: `update.ps1` (Windows) or `update.sh`. New project? Start from the **MaxTemplateWithAgents** template.
+
+### The short version
 
 - **Claude chat:** upload each zip in `dist/` as a skill, once. They then work in every chat.
 - **Claude Code:** run `install.ps1` (Windows) or `install.sh` (Mac/Linux) from this folder. That installs every skill and all 23 subagents for every repo. Then paste `snippets/CLAUDE-AGENTS.md` into each project's CLAUDE.md.

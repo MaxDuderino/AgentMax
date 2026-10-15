@@ -21,6 +21,7 @@ Generated:
   claude-code/agents/*.md              Claude Code subagents (bvd-*, fg-*, qa-*)
   dist/<skill>.zip                     one zip per skill for Claude chat (same bytes every build)
   dist/for-gpt-gemini/                 the paste-in kit for GPT, Gemini, AI Studio and other tools
+  starter/CLAUDE.md, AGENTS.md, VISION.md   the template's generated files (the rest of starter/ is source)
 """
 import io
 import json
@@ -288,8 +289,19 @@ for n in ordered:
 parts.append("\n---\n\n# BVD persona files\n\n" + "\n\n---\n\n".join(personas))
 parts.append("\n---\n\n# Focus Group tester files\n\n" + "\n\n---\n\n".join(testers))
 parts.append("\n---\n\n# QA Team role files\n\n" + "\n\n---\n\n".join(qa_roles))
+parts.append("\n---\n\n# Command cheat sheet\n\n" + strip_frontmatter(read("COMMANDS.md")).split("\n",1)[1])
 emit("dist/for-gpt-gemini/AGENTMAX-ALL.md", "\n".join(parts))
 emit("dist/for-gpt-gemini/INSTRUCTIONS.txt", read("snippets/INSTRUCTIONS.txt"))
+
+# ---------------------------------------- Starter kit (MaxTemplateWithAgents)
+# Built from the same snippets the lineup uses, so the template never drifts.
+# To refresh the template repo, copy starter/ into MaxTemplateWithAgents.
+emit("starter/CLAUDE.md",
+     "# <Project name>\n\n## About this project\n"
+     "_What it is, who it's for, and what \"done\" means live in VISION.md. Vision Keeper writes it with Max on day one._\n\n"
+     + read("snippets/CLAUDE-AGENTS.md"))
+emit("starter/AGENTS.md", read("snippets/AGENTS.md"))
+emit("starter/VISION.md", read("vision-keeper/templates/VISION.md"))
 
 # ------------------------------------------------- Skill zips (deterministic)
 def zip_bytes(folder, overrides):

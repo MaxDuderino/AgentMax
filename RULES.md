@@ -60,6 +60,8 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 | 26 | Henry is the QA seat (BooleMax retired). GoddiMax replaced Ghost. Mattimax absorbed Bernimax. No twelfth seat. | BVD canon |
 | 27 | BVD personas v4.5 (canon plus the AI-written "implementation expansion": speaking styles, instincts, sample lines, visual directions) are approved. ("BVD approved.", 2026-10-15) | Max ✓ |
 | 28 | Mattimax's canon includes costing "effort." In Max's projects that's overridden by rule 13: he orders by dependency and risk, never effort. | AI, unconfirmed (conflict resolved by rule 13) |
+| 29a | **Edit sources, not generated files.** Change the sources and rebuild; never hand-edit what the build overwrites. ("Keep", 2026-10-15) | Max ✓ |
+| 29b | **The status board is honest.** An agent is 🔍 until it does a real job, then ✅ with the date. ("honest is good", 2026-10-15) | Max ✓ |
 | 29 | George's security gate is advisory on personal projects; leaked secrets are his one hard line. | AI, unconfirmed (built from rule 5 + Max wanting Key Keeper) |
 
 ## Scope notes
@@ -80,4 +82,5 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 - Checkpoint branches older than 14 days get flagged for cleanup; Key Keeper blocks a commit when it finds a secret. **AI, unconfirmed**
 - Table Check (video-game vs tabletop) is DnD-Max only. Not part of the general lineup. **Max**
 - Every project gets a VISION.md for Vision Keeper to check against. **Max**
+- New builds start from the GitHub template **MaxTemplateWithAgents**. Its files are generated from AgentMax's `starter/` folder so they never drift. **Max** (2026-10-15)
 - The lineup lives in its own private GitHub repo (MaxDuderino/AgentMax; made private 2026-10-15, "i mean no longer public") that every project points to, and must work in Claude chat, Claude Code, GPT, Gemini / AI Studio and Visual Studio AI. **Max**
