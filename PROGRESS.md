@@ -4,6 +4,26 @@ Newest on top. Each entry quotes the request that caused it.
 
 ---
 
+## 2026-10-15 · BVD Full Council reviews the lineup: 11 of 11 approve with changes
+
+> "ok we are off track, this is an agent build project. so in that spirit, lets have the BVD review the agent files and overall process you just created and suggest improvements or their approval."
+
+**Mistake, owned:** after "make it so" I drifted from building agents into running QA on DnD-Max. This is an agent-build project. The DnD-Max report and the two entries below are that drift. Moving them is one of the open decisions.
+
+**What happened**
+- First real BVD run: a Full Council with all eleven seats as separate agents, each reading the repo cold. Several seats actually ran the build, the installer and the secret scanner on copies.
+- Vote: 11 of 11 approve with changes. Full readout: `council/2026-10-15-lineup-review.md`.
+- Top fixes: bundle RULES.md with every agent, an honest status board, a real GPT/Gemini path, move the DnD-Max work out, one "wrap" instead of eight agents per change, close the Key Keeper holes.
+- Flags: George (Key Keeper holes), Mattimax/Richie/Randy (RULES.md not bundled), GoddiMax (real people's details in a public repo, if they're real).
+
+**Fixed along the way**
+- Jerry accidentally rebuilt three zips during review. Reverted; the repo is clean.
+
+**Not done**
+- Nothing from the review is built yet. Waiting on Max's answers first (design questions before building).
+
+---
+
 ## 2026-10-15 · QA Team live play-through of DnD-Max
 
 > "Yes, play a solo table (Recommended)"
