@@ -84,7 +84,8 @@ def install_hook():
         + first +
         'SCAN="$(dirname "$0")/key_scan.py"\n'
         'if [ ! -f "$SCAN" ]; then echo "Key Keeper: scanner missing from .git/hooks. Run key_scan.py --install-hook again."; exit 1; fi\n'
-        "if command -v python3 >/dev/null 2>&1; then PY=python3; else PY=python; fi\n"
+        # Run python3 rather than just finding it: on Windows, "python3" is a Store stub that exists but fails.
+        'if python3 -c "" >/dev/null 2>&1; then PY=python3; else PY=python; fi\n'
         'exec "$PY" "$SCAN" --staged\n', encoding="utf-8")
     hook.chmod(0o755)
     print("Key Keeper hook installed. Every commit in this repo gets scanned now.")

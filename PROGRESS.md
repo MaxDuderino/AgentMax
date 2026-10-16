@@ -12,6 +12,23 @@ Newest on top. Each entry quotes the request that caused it.
 
 ---
 
+## 2026-10-15 · Key Keeper hook works on Windows
+
+> "Fix the Key Keeper pre-commit hook template in Max's AgentMax repo so it works on Windows." (from the DnD Max session setting up Max's new Windows 11 machine)
+
+**What changed**
+- **The hook now runs `python3` instead of just looking for it.** On Windows, `python3` is a Microsoft Store shortcut that exists but only prints "Python was not found" and fails. The old hook found the shortcut, used it, and blocked every commit. Now, if `python3` doesn't actually run, the hook uses `python`.
+- `dist/key-keeper.zip` rebuilt with the fix.
+
+**Tested**
+- On Max's Windows 11 machine (Store shortcut still present, exit 49): installed the hook in a throwaway repo; it printed "Key Keeper: no secrets found.", exited 0, and a real commit went through.
+
+**Not done / found along the way**
+- Repos that already have the old hook keep it until `key_scan.py --install-hook` runs again there (DnD Max was patched by hand).
+- `python tools/build.py --check` fails on this machine even on untouched `main`: Python 3.14 for Windows compresses zips with zlib-ng, so every zip comes out with different bytes but the same contents. I only committed the key-keeper zip, whose contents really changed. A Windows checkout with `core.autocrlf=true` also makes every generated text file look changed; a `.gitattributes` forcing LF would fix that.
+
+---
+
 ## 2026-10-15 · v1.0: template, install guide, update script, cheat sheet
 
 > "https://github.com/MaxDuderino/MaxTemplateWithAgents ill mark that as a template once complete" · "INSTALL.md for Grizz, Update script, Slash-command cheat sheet" · "Keep 'edit sources, not generated files', all passed the shakedown so i think honest is good go mark done."
