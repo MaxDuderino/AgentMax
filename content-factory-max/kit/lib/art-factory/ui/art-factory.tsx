@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { artApi, money, read, send } from "./api";
+import { ActionButton, isSoundKind, kindWords, post, SoundPlayer, statusLabel, TextEditor, type Cost, type Entry, type GroupRow, type ImageRow, type JobRow, type Kind, type Settings, type Status } from "./factory-shared";
+import { ItemBrowser, RefusalHelper, ReviewMode } from "./factory-views";
 import { MakeArtLimit, PictureMakerPicker } from "./picture-maker-picker";
 
 /**
@@ -15,88 +17,6 @@ import { MakeArtLimit, PictureMakerPicker } from "./picture-maker-picker";
  * The queue itself lives on the server, so closing the tab only pauses it.
  * Each press is one **run**, which stops at its spending limit.
  */
-type Status = "queued" | "making" | "review" | "approved" | "rejected" | "failed";
-
-type Kind = "image" | "voice" | "sfx" | "music";
-
-const kindWords: Record<Kind, { one: string; many: string; icon: string }> = {
-  image: { one: "picture", many: "pictures", icon: "🖼" },
-  voice: { one: "voice line", many: "voice lines", icon: "🗣" },
-  sfx: { one: "sound effect", many: "sound effects", icon: "💥" },
-  music: { one: "piece of music", many: "pieces of music", icon: "🎵" },
-};
-
-const isSoundKind = (kind: Kind) => kind !== "image";
-
-interface Entry {
-  imageId: string;
-  status: Status;
-  seq: number;
-  prompt?: string;
-  attempts: number;
-  reviewUrl?: string;
-  provider?: string;
-  model?: string;
-  error?: string;
-  files?: Record<string, string>;
-  spentUsd?: number;
-  approvedAt?: string;
-  previous?: { at: string; keptAt: string; files: Record<string, string> }[];
-  hookError?: { at: string; message: string };
-}
-
-interface Cost {
-  provider: string;
-  providerName: "google" | "openai" | "practice";
-  model: string;
-  quality: string | null;
-  usd: number | null;
-  usdOther: number | null;
-  seeThrough: boolean;
-  credit: { balanceUsd: number | null; remainingUsd: number | null; stopAtZero: boolean; setAt: string | null } | null;
-}
-
-interface ImageRow {
-  id: string;
-  kind: Kind;
-  number: number;
-  description: string;
-  target: string;
-  outputs: { path: string; width: number; height: number }[];
-  aspect: string;
-  /** Alt text (a picture) or caption (a sound), edits included. */
-  text: string;
-  textEdited: boolean;
-  format?: string;
-  seconds?: number;
-  loop?: boolean;
-  voice?: string;
-}
-
-interface Settings {
-  perMinute: number;
-  concurrency: number;
-  runLimitUsd: number | null;
-}
-
-interface JobRow {
-  key: string;
-  title: string;
-  meta: string;
-  note: string;
-  images: ImageRow[];
-}
-
-interface GroupRow {
-  id: string;
-  title: string;
-  intro: string | null;
-  style: string;
-  styleEdited: boolean;
-  defaultStyle: string;
-  jobs: JobRow[];
-}
-
 interface State {
   appName: string;
   gate: string;
@@ -110,13 +30,12 @@ interface State {
   cost: Cost;
   /** Which maker is on for each sound kind, or null. */
   makers?: Partial<Record<Kind, string | null>>;
+  /** The real picture makers with a key set, for the refusal helper's "try the other one". */
+  pictureMakers?: string[];
 }
 
 type WorkAnswer = { kind: "idle" } | { kind: "off"; message: string } | { kind: "wait"; ms: number; reason?: string } | { kind: "made" | "failed"; imageId: string };
 
-const post = <T,>(body: Record<string, unknown>) => send<T>(artApi.factory, body);
-
-const statusLabel: Record<Status, string> = { queued: "Waiting", making: "Making…", review: "To review", approved: "Approved", rejected: "Rejected", failed: "Failed" };
 
 const newRunId = () => `run-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -128,6 +47,8 @@ export function ArtFactory() {
   const [running, setRunning] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [nextN, setNextN] = useState("10");
+  const [view, setView] = useState<"jobs" | "grid">("jobs");
+  const [reviewing, setReviewing] = useState(false);
   const runningRef = useRef(false);
   const runRef = useRef<string>(newRunId());
 
@@ -219,10 +140,9 @@ export function ArtFactory() {
         const why = value.reason ? `The maker said to wait: “${value.reason}”` : "At the pace limit";
         await refreshEntries();
         const until = Date.now() + value.ms;
-        while (runningRef.current && Date.now() < until) {
-          setNote(`${why}. Trying again in ${Math.ceil((until - Date.now()) / 1000)} s.`);
-          await new Promise((resolve) => setTimeout(resolve, Math.min(1000, Math.max(0, until - Date.now()))));
-        }
+        // Said once, not once a second: a ticking countdown in a live region chatters at screen-reader users (BVD, Matthew).
+        setNote(`${why}. Trying again in ${Math.ceil(value.ms / 1000)} s.`);
+        while (runningRef.current && Date.now() < until) await new Promise((resolve) => setTimeout(resolve, Math.min(1000, Math.max(0, until - Date.now()))));
         continue;
       }
       const found = images.get(value.imageId);
@@ -302,6 +222,11 @@ export function ArtFactory() {
   for (const { image } of images.values()) byKind.set(image.kind, (byKind.get(image.kind) ?? 0) + 1);
   const kindLine = [...byKind].map(([kind, count]) => `${count} ${count === 1 ? kindWords[kind].one : kindWords[kind].many}`).join(" · ");
   const noText = [...images.values()].filter(({ image }) => !image.text);
+  // Everything the export carries: edited words, alt text and captions, and group styles.
+  const edited =
+    Object.values(state.entries).filter((one) => one.prompt).length +
+    [...images.values()].filter(({ image }) => image.textEdited).length +
+    state.groups.filter((one) => one.styleEdited).length;
   // Sounds waiting with nothing switched on to make them, so the page can say so before a run stalls.
   const stuckKinds = (["voice", "sfx", "music"] as const).filter((kind) => !state.makers?.[kind] && [...images.values()].some(({ image }) => image.kind === kind && state.entries[image.id]?.status === "queued"));
 
@@ -381,11 +306,11 @@ export function ArtFactory() {
         <div className="af-row">
           {running ? (
             <button type="button" className="af-btn af-big" onClick={stop}>
-              ■ Stop
+              <span aria-hidden="true">■ </span>Stop
             </button>
           ) : (
             <button type="button" className="af-btn af-big" disabled={!state.activeProvider} onClick={() => void start()}>
-              ▶ Start making
+              <span aria-hidden="true">▶ </span>Start making
             </button>
           )}
           <label className="af-row">
@@ -396,12 +321,12 @@ export function ArtFactory() {
           </label>
           {counts.failed > 0 ? (
             <button type="button" className="af-btn" title="Queue every failed picture again, with its own words. A refused one will likely be refused again unless its words are edited." onClick={() => void queue({ retry: "failed" })}>
-              ↻ Retry {counts.failed} failed
+              <span aria-hidden="true">↻ </span>Retry {counts.failed} failed
             </button>
           ) : null}
           {counts.rejected > 0 ? (
             <button type="button" className="af-btn" onClick={() => void queue({ retry: "rejected" })}>
-              ↻ Redraw {counts.rejected} rejected
+              <span aria-hidden="true">↻ </span>Redraw {counts.rejected} rejected
             </button>
           ) : null}
           {counts.queued > 0 && !running ? (
@@ -420,6 +345,15 @@ export function ArtFactory() {
           <PaceControl settings={state.settings} onSaved={(settings) => setState({ ...state, settings })} />
         </div>
         <MakeArtLimit />
+        {edited ? (
+          <p className="af-small">
+            {edited} {edited === 1 ? "edit" : "edits"} made here (words, alt text, captions or styles).{" "}
+            <a className="af-btn" href={`${artApi.factory}?export=fixes`} download>
+              <span aria-hidden="true">⬇ </span>Export prompt fixes
+            </a>{" "}
+            <span className="af-muted">Asset Forge merges the file into this project&rsquo;s own prompts.json as new numbered versions, so the next rebuild keeps them.</span>
+          </p>
+        ) : null}
         {noText.length ? (
           <p className="af-small af-muted">
             {noText.length} {noText.length === 1 ? "item has" : "items have"} no alt text or caption yet. Asset Forge drafts them; add or fix one on any card in the review tray.
@@ -433,8 +367,13 @@ export function ArtFactory() {
 
       <section className="af-card" aria-labelledby="af-tray">
         <div className="af-spread">
-          <h2 id="af-tray">Review tray {review.length ? `· ${review.length}` : ""}</h2>
-          {review.length > 0 ? (
+          <h2 id="af-tray" tabIndex={-1}>Review tray {review.length ? `· ${review.length}` : ""}</h2>
+          {review.length > 0 || reviewing ? (
+            <button type="button" id="af-review-toggle" className="af-btn" aria-pressed={reviewing} onClick={() => setReviewing(!reviewing)}>
+              {reviewing ? "Back to cards" : "Review mode (keys)"}
+            </button>
+          ) : null}
+          {review.length > 0 && !reviewing ? (
             <ApproveAll
               ids={review.map((entry) => entry.imageId)}
               onProgress={() => void refreshEntries()}
@@ -463,6 +402,27 @@ export function ArtFactory() {
             </ul>
           </div>
         ) : null}
+        {/* Review mode stays open on its "all reviewed" screen until it is closed, so focus never falls out of the tray. */}
+        {reviewing ? (
+          <ReviewMode
+            review={review}
+            images={images}
+            entries={state.entries}
+            onDecided={async (message) => {
+              setNote(message);
+              await refreshEntries();
+              if (/Back in the queue/.test(message) && state.activeProvider && !runningRef.current) void start(`${message} Making now.`);
+            }}
+            onText={setText}
+            onClose={() => {
+              setReviewing(false);
+              // Back to where review mode was opened from, not the top of the page.
+              requestAnimationFrame(() => (document.getElementById("af-review-toggle") ?? document.getElementById("af-tray"))?.focus());
+            }}
+          />
+        ) : null}
+        {/* Only one review interface at a time: the cards are not mounted while review mode is open. */}
+        {!reviewing ? (
         <div className="af-grid">
           {review.map((entry) => {
             const found = images.get(entry.imageId);
@@ -471,6 +431,7 @@ export function ArtFactory() {
             ) : null;
           })}
         </div>
+        ) : null}
         {failed.length > 0 ? (
           <details>
             <summary className="af-bad-text">{failed.length} failed: see why</summary>
@@ -481,6 +442,7 @@ export function ArtFactory() {
                     {images.get(entry.imageId)?.job.title} #{images.get(entry.imageId)?.image.number}: {entry.error}
                   </span>
                   <RedoButton id={entry.imageId} onDone={afterRedo} />
+                  {entry.refused && images.get(entry.imageId) ? <RefusalHelper entry={entry} image={images.get(entry.imageId)!.image} others={state.pictureMakers ?? []} onDone={afterRedo} /> : null}
                 </li>
               ))}
             </ul>
@@ -489,7 +451,27 @@ export function ArtFactory() {
       </section>
 
       <section className="af-card" aria-labelledby="af-list">
-        <h2 id="af-list">The list</h2>
+        <div className="af-spread">
+          <h2 id="af-list">The list</h2>
+          <div className="af-row" role="group" aria-label="Show the list">
+            <button type="button" className="af-btn" aria-pressed={view === "jobs"} onClick={() => setView("jobs")}>
+              By job
+            </button>
+            <button type="button" className="af-btn" aria-pressed={view === "grid"} onClick={() => setView("grid")}>
+              Grid
+            </button>
+          </div>
+        </div>
+        {view === "grid" ? (
+          <ItemBrowser
+            images={images}
+            groups={state.groups}
+            entries={state.entries}
+            onQueue={(body) => void queue(body)}
+            renderDetail={(found) => <ImageLine image={found.image} entry={state.entries[found.image.id]} onQueue={(body) => void queue(body)} onChanged={afterRedo} />}
+          />
+        ) : (
+          <>
         <nav aria-label="Groups" className="af-nav">
           {state.groups.map((one) => {
             const ids = one.jobs.flatMap((job) => job.images.map((image) => image.id));
@@ -522,6 +504,8 @@ export function ArtFactory() {
             />
           ))}
         </div>
+          </>
+        )}
       </section>
     </div>
   );
@@ -715,72 +699,6 @@ function ImageLine({ image, entry, onQueue, onChanged }: { image: ImageRow; entr
   );
 }
 
-/** One action on one item, with the server's warning (if any) passed on. */
-function ActionButton({ id, action, label, done, title, onDone }: { id: string; action: string; label: string; done: string; title?: string; onDone: (message: string) => void }) {
-  const [busy, setBusy] = useState(false);
-  return (
-    <button
-      type="button"
-      className="af-btn"
-      disabled={busy}
-      {...(title ? { title } : {})}
-      onClick={async () => {
-        setBusy(true);
-        const answer = await post<{ warning?: string }>({ action, id });
-        setBusy(false);
-        onDone(answer.ok ? (answer.value.warning ?? done) : answer.message);
-      }}
-    >
-      {label}
-    </button>
-  );
-}
-
-/** A sound in the tray or the list: a named player that never plays by itself (BVD audio rules). */
-function SoundPlayer({ src, label }: { src: string; label: string }) {
-  return <audio controls preload="none" src={src} aria-label={`Play ${label}`} className="af-audio" />;
-}
-
-/** The alt text (a picture) or caption (a sound), editable in review. Saved for this project; the catalogue's own is the fallback. */
-function TextEditor({ image, onSaved }: { image: ImageRow; onSaved: (text: string, edited: boolean) => void }) {
-  const [text, setText] = useState(image.text);
-  const [said, setSaid] = useState<string | null>(null);
-  const sound = isSoundKind(image.kind);
-  const id = `af-text-${image.id.replace(/[^a-z0-9-]/gi, "-")}`;
-  async function save(value: string | null) {
-    const answer = await post<{ text: string }>({ action: "text", id: image.id, text: value });
-    if (answer.ok) {
-      setText(answer.value.text);
-      onSaved(answer.value.text, value !== null && value.trim() !== "");
-    }
-    setSaid(answer.ok ? "Saved." : answer.message);
-  }
-  return (
-    <div className="af-stack">
-      <label className="af-small" htmlFor={id}>
-        {sound ? "Caption, for people who cannot hear it" : "Alt text, read out by screen readers"}
-        {image.textEdited ? " (edited here)" : ""}
-      </label>
-      <textarea id={id} value={text} rows={2} maxLength={500} onChange={(event) => setText(event.target.value)} className="af-textarea" placeholder={sound ? "[A door creaks open]" : "What the picture shows, in a sentence"} />
-      <div className="af-row">
-        <button type="button" className="af-btn" onClick={() => void save(text)}>
-          Save {sound ? "caption" : "alt text"}
-        </button>
-        {image.textEdited ? (
-          <button type="button" className="af-btn" onClick={() => void save(null)}>
-            Back to the catalogue&rsquo;s
-          </button>
-        ) : null}
-        {said ? (
-          <span role="status" className="af-small">
-            {said}
-          </span>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
 function RedoButton({ id, label = "Redo", onDone }: { id: string; label?: string; onDone: (message: string) => void }) {
   return (
     <button
@@ -801,15 +719,26 @@ function ReviewCard({ entry, image, job, onDone, onText }: { entry: Entry; image
   const [busy, setBusy] = useState(false);
   const sound = isSoundKind(image.kind);
 
+  const cardRef = useRef<HTMLElement>(null);
+
   async function act(body: Record<string, unknown>, done: string) {
+    // Where focus goes once this card leaves the tray: the next card's Approve, else the one before, else the tray's heading.
+    const card = cardRef.current;
+    const next = (card?.nextElementSibling ?? card?.previousElementSibling) as HTMLElement | null;
     setBusy(true);
     const answer = await post<{ warning?: string }>(body);
     setBusy(false);
     onDone(answer.ok ? (answer.value.warning ?? done) : answer.message);
+    if (answer.ok && body.action !== "text") {
+      requestAnimationFrame(() => {
+        const target = next?.isConnected ? next.querySelector<HTMLElement>("button.af-go") : null;
+        (target ?? document.getElementById("af-tray"))?.focus();
+      });
+    }
   }
 
   return (
-    <figure className="af-figure">
+    <figure className="af-figure" ref={cardRef} data-review-card={entry.imageId}>
       {sound ? (
         <div className="af-stack af-sound">
           <span aria-hidden="true" style={{ fontSize: "2.2rem" }}>
@@ -841,7 +770,7 @@ function ReviewCard({ entry, image, job, onDone, onText }: { entry: Entry; image
       <TextEditor image={image} onSaved={onText} />
       <div className="af-row">
         <button type="button" disabled={busy} className="af-btn af-go" onClick={() => void act({ action: "approve", id: entry.imageId }, `Approved: live at /${image.target}.`)}>
-          ✓ Approve
+          <span aria-hidden="true">✓ </span>Approve
         </button>
         <button type="button" disabled={busy} className="af-btn" onClick={() => void act({ action: "redo", id: entry.imageId }, "Back in the queue with the same words.")}>
           Redo

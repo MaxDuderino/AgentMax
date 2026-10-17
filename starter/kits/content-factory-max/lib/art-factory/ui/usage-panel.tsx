@@ -62,6 +62,28 @@ interface Report {
   services: { id: string; name: string; usedFor: string; measured: string | null; canRunOut: string; dashboard: string }[];
   prices: { provider: Provider; model: string; price: { inputPerMillion: number; outputPerMillion: number; unit?: Unit; perUnit?: number } | null; overridden: boolean }[];
   pricesCheckedOn: string;
+  /** What each approved item really cost, from the factory (absent on older servers). */
+  factory?: CostTruthReport;
+}
+
+interface CostTruthRow {
+  id: string;
+  title: string;
+  items: number;
+  approved: number;
+  draws: number;
+  redos: number;
+  refused: number;
+  spentUsd: number;
+  perApprovedUsd: number | null;
+  redoRate: number | null;
+}
+
+interface CostTruthReport {
+  listUsd: number | null;
+  listModel: string;
+  groups: CostTruthRow[];
+  total: { approved: number; draws: number; redos: number; spentUsd: number; perApprovedUsd: number | null; redoRate: number | null };
 }
 
 const failureLabels: Record<string, string> = {
@@ -293,6 +315,8 @@ export function UsagePanel() {
           </div>
         )}
       </section>
+
+      {report.factory && report.factory.total.draws > 0 ? <CostTruth truth={report.factory} /> : null}
 
       <section className="af-card" aria-labelledby="af-usage-days">
         <h2 id="af-usage-days">Day by day (last {report.days.length} {report.days.length === 1 ? "day" : "days"}, UTC)</h2>
@@ -552,6 +576,58 @@ function PriceTable({ report, send }: { report: Report; send: (body: Record<stri
           Set price
         </button>
       </form>
+    </section>
+  );
+}
+
+/**
+ * Cost truth (BVD): what an approved item really cost, every redo and refusal
+ * included, next to the list price of one draw. DnD-Max ran about 9.5¢ an
+ * approved picture against 3.5¢ list: this is where that shows.
+ */
+function CostTruth({ truth }: { truth: CostTruthReport }) {
+  const cents = (usd: number | null) => (usd === null ? "none approved yet" : usd < 0.1 ? `${(usd * 100).toFixed(1)}¢` : `$${usd.toFixed(2)}`);
+  const rate = (value: number | null) => (value === null ? "-" : `${Math.round(value * 100)}%`);
+  const over = truth.listUsd && truth.total.perApprovedUsd ? truth.total.perApprovedUsd / truth.listUsd : null;
+  return (
+    <section className="af-card" aria-labelledby="af-usage-truth">
+      <h2 id="af-usage-truth">What an approved item really costs</h2>
+      <p>
+        <strong>{cents(truth.total.perApprovedUsd)}</strong> per approved item across the factory ({truth.total.approved} approved from {truth.total.draws} {truth.total.draws === 1 ? "draw" : "draws"}, {truth.total.redos} {truth.total.redos === 1 ? "redo" : "redos"}), against a list price of{" "}
+        <strong>{cents(truth.listUsd)}</strong> a draw on <code>{truth.listModel}</code>
+        {over && over > 1.05 ? <> : about {over.toFixed(1)}× list, the price of redos and refusals.</> : "."}
+      </p>
+      <div className="af-table-wrap">
+        <table className="af-table" style={{ minWidth: "34rem" }}>
+          <thead>
+            <tr>
+              <th scope="col">Group</th>
+              <th scope="col">Approved</th>
+              <th scope="col">Draws</th>
+              <th scope="col">Redo rate</th>
+              <th scope="col">Refused</th>
+              <th scope="col">Spent</th>
+              <th scope="col">Per approved</th>
+            </tr>
+          </thead>
+          <tbody>
+            {truth.groups.map((row) => (
+              <tr key={row.id}>
+                <td>{row.title}</td>
+                <td>
+                  {row.approved} of {row.items}
+                </td>
+                <td>{row.draws}</td>
+                <td>{rate(row.redoRate)}</td>
+                <td>{row.refused}</td>
+                <td>{cents(row.spentUsd)}</td>
+                <td>{cents(row.perApprovedUsd)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="af-small af-muted">From what each draw reported, so it is as good as the price table. A high redo rate in one group usually means its style block or words need a fix.</p>
     </section>
   );
 }

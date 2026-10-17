@@ -8,7 +8,7 @@ import { meteredImageProvider, type ImageProvider, type ImageProviderName } from
 import { kvFromEnv, MemoryKv, redisCredentials, type Env, type Kv } from "./kv";
 import { meteredMaker, practiceMaker, type Maker } from "./maker";
 import type { MakeArtDeps } from "./make-art-service";
-import { activeProvider, ArtSettingsStore, buildProvider, defaultKeyNames, type ArtSettings } from "./providers";
+import { activeProvider, ArtSettingsStore, buildProvider, defaultKeyNames, readProviderName, type ArtSettings } from "./providers";
 import { R2Client, r2Config } from "./r2-client";
 import { UsageLedger } from "./usage/usage-ledger";
 import { sharpConverter, type ImageConverter } from "./webp";
@@ -77,8 +77,8 @@ export interface ArtFactory {
   isAdminHeaders(headers: Headers): Promise<boolean>;
   whoIs(request: Request): Promise<string | null>;
   catalogue(): Promise<IndexedCatalogue>;
-  /** The site's picture maker as it is switched now, metered with `purpose`. */
-  provider(purpose: string, tag?: string): Promise<ImageProvider | null>;
+  /** The site's picture maker as it is switched now, metered with `purpose`. With `only`, that provider if its key is set, else `null`. */
+  provider(purpose: string, tag?: string, only?: string): Promise<ImageProvider | null>;
   /** The maker for one kind other than the switcher's pictures (the config's `makers`, or Practice), metered; `null` when none. */
   maker(kind: ContentKind, purpose: string): Promise<Maker | null>;
   factoryDeps(): FactoryDeps;
@@ -109,10 +109,12 @@ export function createArtFactory(input: ArtFactoryConfig): ArtFactory {
     return cached.value;
   }
 
-  async function provider(purpose: string, tag?: string) {
+  async function provider(purpose: string, tag?: string, only?: string) {
     const current = await settings.read();
-    const active = activeProvider(env, current.provider, { practice: config.practice, ...(input.keyNames ? { keyNames: input.keyNames } : {}) });
-    if (!active) return null;
+    const wanted = only ? readProviderName(only) : current.provider;
+    if (only && !wanted) return null;
+    const active = activeProvider(env, wanted, { practice: config.practice, ...(input.keyNames ? { keyNames: input.keyNames } : {}) });
+    if (!active || (only && active.name !== only)) return null;
     const made = input.providerFor ? input.providerFor(active.name, current) : buildProvider(active, env, current);
     return meteredImageProvider(made, usage, purpose, tag);
   }
@@ -147,7 +149,7 @@ export function createArtFactory(input: ArtFactoryConfig): ArtFactory {
       store,
       art,
       catalogue,
-      provider: () => provider("art-factory"),
+      provider: (only) => provider("art-factory", undefined, only),
       makers: (kind) => maker(kind, kind === "image" ? "art-factory" : `factory-${kind}`),
       convert,
       ...(input.catalogue.onApprove ? { onApprove: input.catalogue.onApprove.bind(input.catalogue) } : {}),

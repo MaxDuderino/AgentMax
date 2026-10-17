@@ -20,6 +20,17 @@ Max's in-app AI content studio, for any Next.js project: pictures, voice lines, 
 
 Not in the kit (on purpose): DnD-Max's storage mover.
 
+## Working at scale (phase 2, 2026-10-17)
+
+Built for DnD-Max's size: 907 pictures, 117 in one group.
+
+- **Grid view** (beside "By job" in the list): every item as a thumbnail with its status, redos and cost; search (press `/` from anywhere), filters by status, kind and group, "only unmade" and "refused by a safety filter", 48 a page, and **Make the N new ones shown**. Pick a tile for its full line (Words, Put back, Queue…).
+- **Review mode** (in the review tray): one item big, the rest of its set beside it. Keys: **A** approve, **X** reject, **R** redo, **E** edit words, **← →** move, **Esc** close. The screen reader hears one line per decision ("Approved. 3 left. Now: Star"), not a ticking clock.
+- **Refusal helper** (on a refused item, under the tray): **Soften the words** swaps the words safety filters trip on ("bloody" → "battle-worn") and shows every change; you edit and confirm before anything is redrawn. Or **Try Google / OpenAI instead**, for that one draw.
+- **Cost truth** (usage page): what an approved item really cost, redos and refusals included, beside the list price of one draw, with draws, redo rate and refusals per group.
+- **Prompt fixes go home, versioned**: **Export prompt fixes** downloads the words, alt text and style blocks edited here; Asset Forge's `merge_fixes.py` puts them into the project's own `assets/prompts.json` as new numbered versions (the old words kept in each asset's `history`). It refuses AgentMax and the MaxTemplateWithAgents template.
+- **Access**: focus moves to the next card after Approve / Redo / Reject; the wait countdown is said once; the admin nav uses `aria-current` only; emoji are hidden from screen readers.
+
 ## Safety nets, on by default (Max, 2026-10-16)
 
 - **Keep old versions + Put back.** Re-approving something that is live copies the live files to `art-factory/previous/…` first. The list shows **↶ Put back the earlier one**; putting back keeps the newer one too, so you can swap again. Kept versions are tidied away after 30 days (at most 10 per item).

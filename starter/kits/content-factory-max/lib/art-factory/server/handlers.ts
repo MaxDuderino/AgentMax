@@ -1,6 +1,7 @@
 import { makeArtPrompt } from "../core/make-art-prompt";
 import { factoryPrompt, styleFor } from "../core/prompts";
 import { artFilePrefix } from "./art-store";
+import { softenWords } from "../core/soften";
 import { isSound, kindOf } from "../core/types";
 import { approve, approvedUrl, clearQueue, enqueue, putBack, redo, reject, retryHook, setText, textFor, unqueue, work } from "./factory-service";
 import { geminiImageTokens, imageProviderLabels, openAiModels, openAiQualities, openAiTokenEstimate, type ImageAspect } from "./image-provider";
@@ -138,6 +139,41 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
     ];
   }
 
+  /**
+   * Cost truth (BVD, DuderMax/Randy/Jerry/Mattimax): what each approved item really
+   * cost, redos and refusals included, next to the list price of one draw, and the
+   * redo rate per group. DnD-Max: about 9.5¢ an approved picture against 3.5¢ list.
+   */
+  async function costTruth() {
+    const [{ groups }, entries, cost] = await Promise.all([factory.catalogue(), factory.store.entries(), costPerPicture()]);
+    const byId = new Map(entries.map((one) => [one.imageId, one]));
+    const rows = groups.map((group) => {
+      const ids = group.jobs.flatMap((job) => job.images.map((one) => one.id));
+      let approved = 0;
+      let draws = 0;
+      let redos = 0;
+      let spentUsd = 0;
+      let refused = 0;
+      for (const id of ids) {
+        const entry = byId.get(id);
+        if (!entry) continue;
+        if (entry.status === "approved") approved += 1;
+        draws += entry.draws ?? 0;
+        redos += entry.redos ?? 0;
+        spentUsd += entry.spentUsd ?? 0;
+        if (entry.refused) refused += 1;
+      }
+      return { id: group.id, title: group.title, items: ids.length, approved, draws, redos, refused, spentUsd, perApprovedUsd: approved ? spentUsd / approved : null, redoRate: approved ? redos / approved : null };
+    });
+    const total = rows.reduce((sum, row) => ({ approved: sum.approved + row.approved, draws: sum.draws + row.draws, redos: sum.redos + row.redos, spentUsd: sum.spentUsd + row.spentUsd }), { approved: 0, draws: 0, redos: 0, spentUsd: 0 });
+    return {
+      listUsd: cost.usd,
+      listModel: cost.model,
+      groups: rows.filter((row) => row.draws > 0 || row.approved > 0),
+      total: { ...total, perApprovedUsd: total.approved ? total.spentUsd / total.approved : null, redoRate: total.approved ? total.redos / total.approved : null },
+    };
+  }
+
   async function usageView() {
     const snapshot = await factory.usage.snapshot();
     const day = dayOf(new Date());
@@ -147,7 +183,7 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
       models.set(`${line.provider}|${model}`, { provider: line.provider, model });
     }
     const prices = [...models.values()].map(({ provider, model }) => ({ provider, model, price: priceFor(provider, model, day, snapshot.priceOverrides), overridden: Boolean(snapshot.priceOverrides[model]) }));
-    return { ...snapshot, services: await services(), prices, pricesCheckedOn, appName: factory.config.appName };
+    return { ...snapshot, services: await services(), prices, pricesCheckedOn, appName: factory.config.appName, factory: await costTruth() };
   }
 
   const money = (value: unknown, allowZero = true): number | null => {
@@ -168,6 +204,32 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
         const entry = await factory.store.entry(promptFor);
         const group = groups.find((one) => one.id === image.group);
         return json({ id: image.id, own: entry?.prompt ?? image.prompt, edited: Boolean(entry?.prompt), sent: factoryPrompt(styleFor(group ?? image.group, await factory.store.styles()), image, entry?.prompt) });
+      }
+      if (url.searchParams.get("export") === "fixes") {
+        // Prompt fixes made here, for the project's own prompts.json (Max: versioned, in the project's own list, never the template).
+        const [entries, texts, styles, textBases, styleBases] = await Promise.all([factory.store.entries(), factory.store.texts(), factory.store.styles(), factory.store.textBases(), factory.store.styleBases()]);
+        const assetOf = (id: string) => id.split("/").pop() ?? id;
+        const exported = {
+          kind: "content-factory-prompt-fixes",
+          version: 1,
+          project: factory.config.appName,
+          exportedAt: new Date().toISOString(),
+          note: "Merge into this project's assets/prompts.json with Asset Forge's merge_fixes.py. Each change becomes a new numbered version; the old words are kept.",
+          fixes: entries
+            .filter((one) => one.prompt && byId.has(one.imageId))
+            // `original` is the catalogue's words when the edit was made, so a prompts.json change since then is a conflict, not overwritten.
+            .map((one) => ({ id: one.imageId, assetId: assetOf(one.imageId), prompt: one.prompt!, original: one.promptBase ?? byId.get(one.imageId)!.prompt, status: one.status })),
+          texts: Object.entries(texts)
+            .filter(([id]) => byId.has(id))
+            .map(([id, text]) => {
+              const image = byId.get(id)!;
+              const sound = isSound(kindOf(image));
+              return { id, assetId: assetOf(id), field: sound ? "caption" : "alt", text, original: textBases[id] ?? (sound ? image.caption : image.alt) ?? "" };
+            }),
+          styles: groups.filter((group) => styles[group.id] !== undefined).map((group) => ({ family: group.title, text: styles[group.id]!, original: styleBases[group.id] ?? group.style ?? "" })),
+        };
+        const name = `${factory.config.prefix}-prompt-fixes-${exported.exportedAt.slice(0, 10)}.json`;
+        return new Response(`${JSON.stringify(exported, null, 2)}\n`, { headers: { "content-type": "application/json; charset=utf-8", "content-disposition": `attachment; filename="${name}"`, ...noStore } });
       }
       if (url.searchParams.get("only") === "entries") {
         const list = await factory.store.entries();
@@ -211,6 +273,7 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
         store: factory.art.kind,
         memory: factory.kv.kind,
         cost: await costPerPicture(),
+        pictureMakers: providerStatuses(factory.env, artSettings, options).filter((one) => one.configured && one.name !== "practice").map((one) => one.name),
         // Which kinds have a maker switched on right now, so the page can say which sounds would wait.
         makers: Object.fromEntries(await Promise.all((["voice", "sfx", "music"] as const).map(async (kind) => [kind, (await factory.maker(kind, "check"))?.name ?? null] as const))),
       });
@@ -256,12 +319,25 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
           const runId = typeof body.runId === "string" && /^[a-z0-9-]{6,64}$/i.test(body.runId) ? body.runId : undefined;
           return json(await work(deps, runId ? { runId } : {}));
         }
+        case "soften": {
+          // The refusal helper: the item's words with the filter-tripping ones swapped. Shown, never sent, until the admin confirms with Redo.
+          if (typeof body.id !== "string") return bad("invalid", "Which item?");
+          const image = (await factory.catalogue()).byId.get(body.id);
+          if (!image) return bad("art-job-unknown", "The catalogue no longer lists that item.", 404);
+          const words = (await factory.store.entry(body.id))?.prompt ?? image.prompt;
+          return json({ id: body.id, before: words, ...softenWords(words) });
+        }
         case "approve":
         case "reject":
         case "redo":
         case "put-back":
         case "retry-hook": {
           if (typeof body.id !== "string") return bad("invalid", "Which item?");
+          if (body.action === "redo" && body.provider !== undefined) {
+            const asked = readProviderName(body.provider);
+            if (!asked || asked === "practice") return bad("invalid", "Try the other provider: OpenAI or Google.");
+            if (!siteKeyFor(asked, factory.env, factory.config.keyNames)) return bad("not-configured", `${asked === "openai" ? "OpenAI" : "Google"} is not set up: its key is not in the environment variables.`);
+          }
           const result =
             body.action === "approve"
               ? await approve(deps, body.id)
@@ -271,7 +347,7 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
                   ? await putBack(deps, body.id)
                   : body.action === "retry-hook"
                     ? await retryHook(deps, body.id)
-                    : await redo(deps, body.id, body.prompt === null ? null : typeof body.prompt === "string" ? body.prompt : undefined);
+                    : await redo(deps, body.id, body.prompt === null ? null : typeof body.prompt === "string" ? body.prompt : undefined, typeof body.provider === "string" ? { provider: body.provider } : {});
           if (!result.ok) return bad(result.code, result.message, result.code === "art-job-unknown" ? 404 : result.code === "store-failed" ? 502 : 409);
           return json(result.warning ? { ...result.entry, warning: result.warning } : result.entry);
         }
@@ -291,8 +367,8 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
           if (typeof body.group !== "string" || !groups.some((group) => group.id === body.group)) return bad("invalid", "Which group?");
           const text = body.text === null ? null : typeof body.text === "string" ? body.text.trim().slice(0, 2000) : undefined;
           if (text === undefined) return bad("invalid", "The style is some words, or nothing to go back to the default.");
-          await factory.store.setStyle(body.group, text === "" ? null : text);
           const group = groups.find((one) => one.id === body.group)!;
+          await factory.store.setStyle(body.group, text === "" ? null : text, group.style ?? "");
           return json({ group: body.group, style: styleFor(group, await factory.store.styles()) });
         }
         case "settings": {

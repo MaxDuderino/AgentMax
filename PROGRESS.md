@@ -1,7 +1,8 @@
-# Status · 2026-10-17 · v1.2 (merged)
-**Where we are:** **AgentMax v1.0 + Content Factory MAX phase 1.** 14 agents: 13 ✅ proven, plus **Content Factory MAX** (was the Art Factory; 🧪 tested in a fresh Next.js app, not yet in one of Max's projects). The template's code kit is now `starter/kits/content-factory-max/`. New builds start from the MaxTemplateWithAgents template.
-**Next up:** Content Factory MAX phase 2 (working at 907-item scale: grid, review mode with keys, refusal helper, cost truth, versioned prompt fixes), then phase 3, the Sound Stage (real voice, effect and music makers).
+# Status · 2026-10-17 · v1.3 (phase 2 on its own PR, not merged)
+**Where we are:** **AgentMax v1.0 + Content Factory MAX phases 1 and 2.** 14 agents: 13 ✅ proven, plus **Content Factory MAX** (was the Art Factory; 🧪 tested in a fresh Next.js app, not yet in one of Max's projects). The template's code kit is now `starter/kits/content-factory-max/`. New builds start from the MaxTemplateWithAgents template.
+**Next up:** Content Factory MAX phase 3, the Sound Stage (port DnD-Max's Voices studio; real voice, effect and music makers), then phase 4 (themes, group-finished banner).
 **Waiting on Max:**
+- Merge the phase 2 PR when happy.
 - DnD-Max's live factory has the same 3-minute lease bug the BVD found (a slow picture can be paid for twice at 2+ lanes): fix it in the DnD-Max repo.
 - Delete the QA sample branch `docs/agentmax-qa-2026-10-15` in DnD-Max (GitHub → Branches → trash icon) and test table QXT-RZN on the live site.
 - Check push protection on DnD-Max.
@@ -9,6 +10,34 @@
 # Progress Log
 
 Newest on top. Each entry quotes the request that caused it.
+
+---
+
+## 2026-10-17 · Content Factory MAX, phase 2: working at 907-item scale
+
+> "proceed wth next steps"
+
+Phase 2 of `council/2026-10-16-art-factory-review.md`, from Max's answers: **"Review mode + grid toggle"**, refusals **"Both"** (soften the words, shown before the redraw, or try the other provider), prompt fixes **"Saved to that project's own art list, versioned"**. Nothing in DnD-Max was touched.
+
+**What changed**
+- **Grid view** beside "By job": thumbnails with status, redos and cost; search (`/` jumps to it), filters (status, kind, group, only unmade, refused), 48 a page, "Make the N new ones shown", and a tile opens the item's full line.
+- **Review mode** in the tray: one item big with the rest of its set; **A** approve, **X** reject, **R** redo, **E** edit words, **← →**, **Esc** (focus goes back to the button that opened it). One spoken line per decision.
+- **Refusal helper** on refused items: **Soften the words** (plain word swaps like "bloody" → "battle-worn", every change listed, editable, sent only on Redraw) and **Try Google / OpenAI instead** for one draw. An item asked for a provider with no key waits rather than going to the wrong one.
+- **Cost truth** on the usage page: cost per approved item vs the list price of one draw, with draws, redo rate and refusals per group. Items now count their draws and redos.
+- **Prompt fixes go home, versioned:** "Export prompt fixes" downloads the words, alt text and style blocks edited in the factory; Asset Forge's new `merge_fixes.py` writes them into the project's own prompts.json as numbered versions (old words kept in `history`), skips both-sides-edited conflicts unless `--force`, and **refuses AgentMax and the template**.
+- **Access fixes** from the council: focus moves to the next card after a decision; the wait countdown is said once instead of every second; the admin nav uses `aria-current` only; emoji on buttons are hidden from screen readers.
+
+**Checked**
+- Kit tests: 106 pass (11 new). `tsc` clean. `python tools/build.py --check` clean.
+- `merge_fixes.py` on a test prompts.json: versions and history written, a conflict skipped, a second run changes nothing, and it refused a path inside AgentMax.
+- Fresh Next.js app (the throwaway one from phase 1, kit reinstalled): `tsc` and `next build` clean. In the browser, with the keyboard: review mode opened with focus in it, **A** approved and moved on with one spoken line, arrows moved, **Esc** closed back to its button; the grid found an item by `/` + "crab" and opened it with Enter; Soften the words showed "bloody" → "battle-worn"; cost truth showed on the usage page; the export downloaded. Two bugs found and fixed there: `/` did nothing when the page itself had focus, and Esc dropped focus to the top of the page.
+- Test data: only in that throwaway app's memory.
+
+**Not done / not checked**
+- No screen reader was run; the checks were keyboard and the live-region text.
+- "Soften the words" is word swaps, not AI: it will miss refusals that are about the idea rather than a word. Try the other provider is the backup.
+- Batch items (numbered, no asset id) export but cannot merge back; the script lists them.
+- In the usage page's overall redo rate, redos in groups with nothing approved yet still count.
 
 ---
 

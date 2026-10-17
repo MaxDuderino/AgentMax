@@ -29,6 +29,8 @@ export interface FactoryEntry {
   seq: number;
   /** Edited words from Redo; absent uses the catalogue's own. */
   prompt?: string;
+  /** The catalogue's words when they were first edited here: the export's baseline, so a later prompts.json change shows as a conflict. */
+  promptBase?: string;
   attempts: number;
   queuedAt: string;
   startedAt?: string;
@@ -59,6 +61,14 @@ export interface FactoryEntry {
   hookError?: { at: string; message: string };
   /** What making this item has cost so far, every try and redo, in dollars. */
   spentUsd?: number;
+  /** How many times it was sent back to be made again after one came back. */
+  redos?: number;
+  /** How many versions have come back from a maker. */
+  draws?: number;
+  /** The last failure was a refusal (a safety filter), so the refusal helper is offered. */
+  refused?: boolean;
+  /** Make the next try on this picture provider only (the refusal helper's "try the other one"). */
+  useProvider?: string;
 }
 
 export interface ApprovedFile {
@@ -141,9 +151,18 @@ export class FactoryStore {
   async styles(): Promise<Record<string, string>> {
     return this.#kv.hgetall(`${this.#p}:styles`);
   }
-  async setStyle(group: string, text: string | null): Promise<void> {
-    if (text === null) await this.#kv.hdel(`${this.#p}:styles`, group);
-    else await this.#kv.hset(`${this.#p}:styles`, { [group]: text });
+  /** `base` is the catalogue's style when it was first edited here, kept for the export; it is set once and cleared with the edit. */
+  async setStyle(group: string, text: string | null, base?: string): Promise<void> {
+    if (text === null) {
+      await this.#kv.hdel(`${this.#p}:styles`, group);
+      await this.#kv.hdel(`${this.#p}:styles-base`, group);
+      return;
+    }
+    await this.#kv.hset(`${this.#p}:styles`, { [group]: text });
+    if (base !== undefined && (await this.#kv.hget(`${this.#p}:styles-base`, group)) === null) await this.#kv.hset(`${this.#p}:styles-base`, { [group]: base });
+  }
+  async styleBases(): Promise<Record<string, string>> {
+    return this.#kv.hgetall(`${this.#p}:styles-base`);
   }
   async settings(): Promise<FactorySettings> {
     return { ...defaultFactorySettings, ...(parseJson<FactorySettings>(await this.#kv.get(`${this.#p}:settings`)) ?? {}) };
@@ -172,8 +191,17 @@ export class FactoryStore {
   async texts(): Promise<Record<string, string>> {
     return this.#kv.hgetall(`${this.#p}:texts`);
   }
-  async setText(imageId: string, text: string | null): Promise<void> {
-    if (text === null) await this.#kv.hdel(`${this.#p}:texts`, imageId);
-    else await this.#kv.hset(`${this.#p}:texts`, { [imageId]: text });
+  /** `base` is the catalogue's alt text or caption when it was first edited here, kept for the export. */
+  async setText(imageId: string, text: string | null, base?: string): Promise<void> {
+    if (text === null) {
+      await this.#kv.hdel(`${this.#p}:texts`, imageId);
+      await this.#kv.hdel(`${this.#p}:texts-base`, imageId);
+      return;
+    }
+    await this.#kv.hset(`${this.#p}:texts`, { [imageId]: text });
+    if (base !== undefined && (await this.#kv.hget(`${this.#p}:texts-base`, imageId)) === null) await this.#kv.hset(`${this.#p}:texts-base`, { [imageId]: base });
+  }
+  async textBases(): Promise<Record<string, string>> {
+    return this.#kv.hgetall(`${this.#p}:texts-base`);
   }
 }

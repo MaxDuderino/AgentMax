@@ -835,6 +835,7 @@ Same style bible and same asset list either way, so a project can start in ChatG
 3. **Write the prompts** into prompts.json (shape below).
 4. **Build what the project uses** (both scripts are in this skill's folder):
    - **Project has Content Factory MAX:** `python build_catalogue.py <project>/assets/prompts.json <project>/art/art-catalogue.json`, then tell Max which groups to make first in `/admin/art-factory`.
+   - **Max edited words in the factory:** he exports them (**Export prompt fixes**), then `python merge_fixes.py <project>/assets/prompts.json <export>.json --dry-run`, show him the list, run it for real, and rebuild the catalogue. Each change is a new numbered `version` with the old words in the asset's `history`. It refuses AgentMax and the template: fixes belong to the project ("i dont want it changing my template base image with a change from boogermax.com", Max, 2026-10-16).
    - **No factory:** `python build_queue.py <project>/assets/prompts.json <project>/asset-prompts.html`. If the project is a Next.js app, mention once that the `content-factory-max` skill can add the in-app factory.
 5. **Update status** when Max reports back ("did the first 12", "redo the goblin"). Edit prompts.json and rebuild. In the factory, approvals are recorded by the factory itself; mark an asset `done` in prompts.json only when it was made by hand, so the catalogue leaves it out.
 
@@ -969,6 +970,8 @@ The catalogue says what to draw, where each file lands and every size it is cut 
 ### 5. Put the Make art buttons where things are built
 Go through the app screen by screen and list where a person names or describes something that has a picture (a character sheet, a level editor, a card builder). **(ask)** which screens get a ✨ Make art button, multiple choice. Each button must **save** the picture into the thing it was made for (`onMade` writes the URL into the project's data and it shows). A button whose picture goes nowhere is a hollow feature.
 
+**Prompt fixes go back to the project's own list** (Max: "Saved to that project's own art list, versioned"). When Max has edited words, alt text or style blocks in the factory, he presses **Export prompt fixes**; merge the file with Asset Forge's `merge_fixes.py <project>/assets/prompts.json <export>.json` (try `--dry-run` first, show Max the list), then rebuild the catalogue. Every change becomes a numbered version with the old words kept. Never merge into AgentMax or the template; the script refuses both.
+
 Show approved art in the app with `artSrc(path)` from `lib/art-factory/ui/api.ts` (or `artSrc(path, { withText: true })` for the alt text too); it falls back to the `public/` copy until one is approved.
 
 ### 6. Keys, storage and memory (Key Keeper rules)
@@ -986,7 +989,7 @@ Menu names move; if a label doesn't match, search the provider's help for "API k
 
 ### 7. Check it really works
 1. `npx tsc --noEmit` and `npx next build` in the project.
-2. Locally with no keys: open `/admin/art-factory`, switch to **Practice**, queue one job, watch it make, approve one, then open its `/api/art/made/<path>` and see it. Try Redo with edited words and Reject. Approve a picture a second time and press **Put back**. Edit an alt text on a review card. If the catalogue has sounds, queue one and play it in the tray (it must not play by itself). Press a Make art button.
+2. Locally with no keys: open `/admin/art-factory`, switch to **Practice**, queue one job, watch it make, approve one, then open its `/api/art/made/<path>` and see it. Try Redo with edited words and Reject. Approve a picture a second time and press **Put back**. Edit an alt text on a review card. Open **Review mode** and decide one with **A** from the keyboard. Switch the list to **Grid**, press `/`, find an item by name. If the catalogue has sounds, queue one and play it in the tray (it must not play by itself). Press a Make art button.
 3. Keyboard pass on both admin pages (rule 8a): every button reachable and labelled, focus visible.
 4. After deploy, with Max's OK: one real picture on the cheapest model (GPT Image 1 mini, low), approve it, check it in the app and on `/admin/usage`. Then switch back to his normal model.
 5. Hand the live check to the **QA Team**. List any test pictures made on the live site and clean them up (Redo or Reject, or remove them from R2), or get Max's OK to keep them.
