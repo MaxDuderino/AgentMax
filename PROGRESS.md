@@ -1,18 +1,24 @@
-# Status · 2026-10-17 · v1.2 (on PR #2, not merged)
+# Status · 2026-10-17 · v1.2 (merged)
 **Where we are:** **AgentMax v1.0 + Content Factory MAX phase 1.** 14 agents: 13 ✅ proven, plus **Content Factory MAX** (was the Art Factory; 🧪 tested in a fresh Next.js app, not yet in one of Max's projects). The template's code kit is now `starter/kits/content-factory-max/`. New builds start from the MaxTemplateWithAgents template.
 **Next up:** Content Factory MAX phase 2 (working at 907-item scale: grid, review mode with keys, refusal helper, cost truth, versioned prompt fixes), then phase 3, the Sound Stage (real voice, effect and music makers).
 **Waiting on Max:**
-- Merge PR #2 when happy.
-- Run `install.ps1` again so `~/.claude` gets the renamed skill (it removes the old `art-factory` skill folder) and the refreshed RULES.md copy.
 - DnD-Max's live factory has the same 3-minute lease bug the BVD found (a slow picture can be paid for twice at 2+ lanes): fix it in the DnD-Max repo.
-- Copy `starter/` into MaxTemplateWithAgents so new projects get the kit.
-- Mark MaxTemplateWithAgents as a template on GitHub (Settings → tick "Template repository").
 - Delete the QA sample branch `docs/agentmax-qa-2026-10-15` in DnD-Max (GitHub → Branches → trash icon) and test table QXT-RZN on the live site.
 - Check push protection on DnD-Max.
 
 # Progress Log
 
 Newest on top. Each entry quotes the request that caused it.
+
+---
+
+## 2026-10-17 · Shipped: PR #2 merged, lineup reinstalled, template updated
+
+> "go for it"
+
+- Merged AgentMax PR #2 (Art Factory + BVD review + Content Factory MAX phase 1) into main.
+- Ran `install.ps1`: every skill reinstalled, the retired `art-factory` skill folder removed, `~/.claude/RULES.md` refreshed.
+- Copied `starter/` into **MaxTemplateWithAgents** (its PR #1, merged): new projects now ship `kits/content-factory-max/`. It was already marked as a template on GitHub.
 
 ---
 
