@@ -27,7 +27,7 @@ A ZIP download can't update itself. To update, download it again.
 1. **Turn on code execution:** Settings → Capabilities → turn on **Code execution and file creation**. Skills need it.
 2. **Upload the skills:** go to **Customize → Skills** → **+** → **Create skill** → **Upload a skill**.
    - Pick a zip from the `dist` folder.
-   - **Repeat for each zip.** One zip holds one skill, and there are 13. Start with `session-kickoff.zip` and `wrap.zip` if you're short on time.
+   - **Repeat for each zip.** One zip holds one skill, and there are 14. Start with `session-kickoff.zip` and `wrap.zip` if you're short on time.
 3. **Test it:** open a new chat and say **"catch me up"**.
 
 _These menu names come from Claude's help center ("Use skills in Claude"). If Claude moves them, search its help center for "upload a skill"._

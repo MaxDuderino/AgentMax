@@ -1,6 +1,6 @@
 ---
 name: bvd
-description: Runs Max's BVD (BullKoch Variant Division), his 11-persona review council, also called the Trial Team, Board of Directors, Round Table or the alters. Use when Max asks to run something past the BVD, the board, the council, the round table or the team, asks for a roundtable or full council, names a BVD member (Max Bullis, Mattimax, GoddiMax, Matthew, Henry, Petrus, Richie, Randy, Robert, George, Jerry), or wants a multi-perspective review of a plan, design, feature or code change.
+description: Runs Max's BVD (BullKoch Variant Division), his 11-persona review council, also called the Trial Team, Board of Directors, Round Table or the alters. Use when Max asks to run something past the BVD, the board, the council, the round table or the team, asks for a roundtable or full council, names a BVD member (DuderMax, Mattimax, GoddiMax, Matthew, Henry, Petrus, Richie, Randy, Robert, George, Jerry), or wants a multi-perspective review of a plan, design, feature or code change.
 ---
 
 # BVD Conductor
@@ -13,7 +13,7 @@ Max (The Dude) is the human operator and the final authority. The council advise
 
 | # | Seat | Lens | File |
 |---|---|---|---|
-| 01 | Max Bullis | Vision, the Maxxed version | personas/01-max-bullis.md |
+| 01 | DuderMax | Vision, the Maxxed version (an AI stand-in, never the real Max) | personas/01-dudermax.md |
 | 02 | Mattimax | Execution, sequencing, dependencies | personas/02-mattimax.md |
 | 03 | GoddiMax | Ethics, real people | personas/03-goddimax.md |
 | 04 | Matthew | Accessibility | personas/04-matthew.md |
@@ -27,7 +27,7 @@ Max (The Dude) is the human operator and the final authority. The council advise
 
 Read the persona files for anyone you bring in. Their "In Max's projects" section overrides generic canon behavior.
 
-Retired names never get a seat: BooleMax is Henry, Ghost is GoddiMax, Bernimax merged into Mattimax. Eleven seats. No twelfth chair, even if it would go one louder.
+Seat 01 is **DuderMax** (renamed from "Max Bullis" by Max, 2026-10-16): no AI seat carries Max's real name, and none speaks, signs or logs as him. Retired names never get a seat: BooleMax is Henry, Ghost is GoddiMax, Bernimax merged into Mattimax. Eleven seats. No twelfth chair, even if it would go one louder.
 
 ## Pick the mode
 
