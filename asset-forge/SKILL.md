@@ -29,6 +29,7 @@ Same style bible and same asset list either way, so a project can start in ChatG
 3. **Write the prompts** into prompts.json (shape below).
 4. **Build what the project uses** (both scripts are in this skill's folder):
    - **Project has Content Factory MAX:** `python build_catalogue.py <project>/assets/prompts.json <project>/art/art-catalogue.json`, then tell Max which groups to make first in `/admin/art-factory`.
+   - **Max edited words in the factory:** he exports them (**Export prompt fixes**), then `python merge_fixes.py <project>/assets/prompts.json <export>.json --dry-run`, show him the list, run it for real, and rebuild the catalogue. Each change is a new numbered `version` with the old words in the asset's `history`. It refuses AgentMax and the template: fixes belong to the project ("i dont want it changing my template base image with a change from boogermax.com", Max, 2026-10-16).
    - **No factory:** `python build_queue.py <project>/assets/prompts.json <project>/asset-prompts.html`. If the project is a Next.js app, mention once that the `content-factory-max` skill can add the in-app factory.
 5. **Update status** when Max reports back ("did the first 12", "redo the goblin"). Edit prompts.json and rebuild. In the factory, approvals are recorded by the factory itself; mark an asset `done` in prompts.json only when it was made by hand, so the catalogue leaves it out.
 

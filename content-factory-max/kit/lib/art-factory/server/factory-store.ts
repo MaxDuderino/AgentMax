@@ -59,6 +59,14 @@ export interface FactoryEntry {
   hookError?: { at: string; message: string };
   /** What making this item has cost so far, every try and redo, in dollars. */
   spentUsd?: number;
+  /** How many times it was sent back to be made again after one came back. */
+  redos?: number;
+  /** How many versions have come back from a maker. */
+  draws?: number;
+  /** The last failure was a refusal (a safety filter), so the refusal helper is offered. */
+  refused?: boolean;
+  /** Make the next try on this picture provider only (the refusal helper's "try the other one"). */
+  useProvider?: string;
 }
 
 export interface ApprovedFile {

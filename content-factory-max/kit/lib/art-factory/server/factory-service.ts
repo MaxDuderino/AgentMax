@@ -50,8 +50,11 @@ export interface FactoryDeps {
   store: FactoryStore;
   art: ArtStore;
   catalogue: () => Promise<IndexedCatalogue>;
-  /** The site's picture maker, already metered as `art-factory`; `null` when none is on. */
-  provider: () => Promise<ImageProvider | null>;
+  /**
+   * The site's picture maker, already metered as `art-factory`; `null` when none is on.
+   * With a name, that provider only (the refusal helper's "try the other one"), or `null` if it has no key.
+   */
+  provider: (only?: string) => Promise<ImageProvider | null>;
   /** Makers for the other kinds (voices, effects, music), already metered; `null` for a kind nothing makes. A maker here for pictures wins over `provider`. */
   makers?: (kind: ContentKind) => Promise<Maker | null>;
   convert: ImageConverter;
@@ -74,8 +77,12 @@ export const keepPreviousCount = 10;
 
 const nowOf = (deps: Pick<FactoryDeps, "now">) => deps.now?.() ?? new Date();
 
-/** The maker for one kind: the project's own if it gave one, else the site's picture maker for pictures. */
-export async function makerFor(deps: Pick<FactoryDeps, "makers" | "provider">, kind: ContentKind): Promise<Maker | null> {
+/** The maker for one kind: the project's own if it gave one, else the site's picture maker for pictures (or, with `only`, that one provider). */
+export async function makerFor(deps: Pick<FactoryDeps, "makers" | "provider">, kind: ContentKind, only?: string): Promise<Maker | null> {
+  if (kind === "image" && only) {
+    const chosen = await deps.provider(only);
+    return chosen && chosen.name === only ? imageMaker(chosen) : null;
+  }
   const own = (await deps.makers?.(kind)) ?? null;
   if (own && own.kinds.includes(kind)) return own;
   if (kind !== "image") return null;
@@ -95,6 +102,8 @@ function carried(entry: FactoryEntry | null): Partial<FactoryEntry> {
     ...(entry.approvedAt ? { approvedAt: entry.approvedAt } : {}),
     ...(entry.previous?.length ? { previous: entry.previous } : {}),
     ...(entry.hookError ? { hookError: entry.hookError } : {}),
+    ...(entry.redos ? { redos: entry.redos } : {}),
+    ...(entry.draws ? { draws: entry.draws } : {}),
   };
 }
 
@@ -227,7 +236,7 @@ export async function work(deps: FactoryDeps, options: { runId?: string } = {}):
     }
   }
   const { byId, groups } = await deps.catalogue();
-  const makers = new Map<ContentKind, Maker | null>();
+  const makers = new Map<string, Maker | null>();
   const missing = new Set<ContentKind>();
 
   for (const candidate of queued) {
@@ -238,8 +247,10 @@ export async function work(deps: FactoryDeps, options: { runId?: string } = {}):
       continue;
     }
     const kind = kindOf(image);
-    if (!makers.has(kind)) makers.set(kind, await makerFor(deps, kind));
-    const maker = makers.get(kind) ?? null;
+    // An item asked for one provider (the refusal helper's "try the other one") waits for that one.
+    const slot = candidate.useProvider ? `${kind}|${candidate.useProvider}` : kind;
+    if (!makers.has(slot)) makers.set(slot, await makerFor(deps, kind, candidate.useProvider));
+    const maker = makers.get(slot) ?? null;
     if (!maker) {
       // Nothing makes this kind yet: it waits, and the next kind in the line gets its turn.
       missing.add(kind);
@@ -281,6 +292,7 @@ export async function work(deps: FactoryDeps, options: { runId?: string } = {}):
         const next: FactoryEntry = {
           ...making,
           status: again ? "queued" : "failed",
+          ...(drawn.code === "art-refused" ? { refused: true } : {}),
           finishedAt: nowOf(deps).toISOString(),
           error:
             drawn.code === "art-refused"
@@ -306,7 +318,9 @@ export async function work(deps: FactoryDeps, options: { runId?: string } = {}):
         await deps.store.save({ ...making, status: "queued", attempts: entry.attempts, error: `Made, but the art store would not keep it (${said}).` });
         return { kind: "off", message: `The ${kindNames[kind].one} was made but the art store would not save it (${said}). The factory has stopped so it does not pay for more it cannot keep. It is back in the queue.` };
       }
-      const review: FactoryEntry = { ...making, status: "review", finishedAt: nowOf(deps).toISOString(), reviewUrl: stored.url, reviewType: preview.contentType };
+      const review: FactoryEntry = { ...making, status: "review", finishedAt: nowOf(deps).toISOString(), reviewUrl: stored.url, reviewType: preview.contentType, draws: (making.draws ?? 0) + 1 };
+      delete review.useProvider;
+      delete review.refused;
       await deps.store.save(review);
       // Can the store hand it back? If not, every item after this one is money spent on a file nobody can approve.
       if (deps.art.kind === "r2" && !(await deps.art.read(stored.url))) {
@@ -557,7 +571,7 @@ async function tidyPrevious(deps: FactoryDeps): Promise<void> {
 }
 
 /** Back in the queue, with the same words or new ones; the item under review is thrown away. Works on an approved item too, to replace it (what is live stays live until the new one is approved). */
-export async function redo(deps: FactoryDeps, imageId: string, prompt?: string | null): Promise<ReviewResult> {
+export async function redo(deps: FactoryDeps, imageId: string, prompt?: string | null, options: { provider?: string } = {}): Promise<ReviewResult> {
   if (!(await deps.catalogue()).byId.get(imageId)) return unknownJob();
   const entry = await deps.store.entry(imageId);
   if (!entry || entry.status === "queued" || entry.status === "making") return notInReview();
@@ -565,6 +579,8 @@ export async function redo(deps: FactoryDeps, imageId: string, prompt?: string |
   const edited = typeof prompt === "string" ? prompt.trim().slice(0, 6000) : "";
   const kept = carried(entry);
   delete kept.prompt;
+  // A redo of something already made counts; a first try after a failure or a refusal is not a redo.
+  if (entry.reviewUrl || entry.status === "approved" || entry.status === "rejected") kept.redos = (entry.redos ?? 0) + 1;
   const next: FactoryEntry = {
     ...kept,
     imageId,
@@ -574,6 +590,7 @@ export async function redo(deps: FactoryDeps, imageId: string, prompt?: string |
     queuedAt: nowOf(deps).toISOString(),
     // `null` goes back to the catalogue's own words; a string of 3+ characters replaces them; absent keeps any earlier edit.
     ...(prompt === null ? {} : edited.length >= 3 ? { prompt: edited } : entry.prompt ? { prompt: entry.prompt } : {}),
+    ...(options.provider ? { useProvider: options.provider } : {}),
   };
   await deps.store.save(next);
   return { ok: true, entry: next };

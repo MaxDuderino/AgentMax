@@ -16,11 +16,11 @@ export function AdminShell({ appName, title, intro, current, adminBase = "/admin
           <div className="af-spread">
             <p className="af-kicker">{appName} · Admin</p>
             <nav aria-label="Admin pages" className="af-nav">
-              <a className="af-btn" aria-current={current === "factory" ? "page" : undefined} aria-pressed={current === "factory"} href={`${adminBase}/art-factory`}>
-                🏭 Content Factory MAX
+              <a className="af-btn" aria-current={current === "factory" ? "page" : undefined} href={`${adminBase}/art-factory`}>
+                <span aria-hidden="true">🏭 </span>Content Factory MAX
               </a>
-              <a className="af-btn" aria-current={current === "usage" ? "page" : undefined} aria-pressed={current === "usage"} href={`${adminBase}/usage`}>
-                💸 AI usage &amp; credits
+              <a className="af-btn" aria-current={current === "usage" ? "page" : undefined} href={`${adminBase}/usage`}>
+                <span aria-hidden="true">💸 </span>AI usage &amp; credits
               </a>
               <SignOut adminBase={adminBase} />
             </nav>
