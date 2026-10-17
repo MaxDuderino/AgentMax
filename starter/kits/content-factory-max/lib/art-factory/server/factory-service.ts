@@ -97,6 +97,7 @@ function carried(entry: FactoryEntry | null): Partial<FactoryEntry> {
   if (!entry) return {};
   return {
     ...(entry.prompt ? { prompt: entry.prompt } : {}),
+    ...(entry.prompt && entry.promptBase !== undefined ? { promptBase: entry.promptBase } : {}),
     ...(entry.spentUsd !== undefined ? { spentUsd: entry.spentUsd } : {}),
     ...(entry.files ? { files: entry.files } : {}),
     ...(entry.approvedAt ? { approvedAt: entry.approvedAt } : {}),
@@ -121,7 +122,16 @@ export async function enqueue(deps: FactoryDeps, imageIds: readonly string[]): P
       result.skipped += 1;
       continue;
     }
-    await deps.store.save({ ...carried(existing), imageId: id, status: "queued", seq: await deps.store.nextSeq(), attempts: 0, queuedAt: nowOf(deps).toISOString() });
+    await deps.store.save({
+      ...carried(existing),
+      // Queueing a rejected one again is a redo (it came back, and was turned down); retrying a failed one is not.
+      ...(existing?.status === "rejected" ? { redos: (existing.redos ?? 0) + 1 } : {}),
+      imageId: id,
+      status: "queued",
+      seq: await deps.store.nextSeq(),
+      attempts: 0,
+      queuedAt: nowOf(deps).toISOString(),
+    });
     result.added += 1;
   }
   return result;
@@ -579,6 +589,8 @@ export async function redo(deps: FactoryDeps, imageId: string, prompt?: string |
   const edited = typeof prompt === "string" ? prompt.trim().slice(0, 6000) : "";
   const kept = carried(entry);
   delete kept.prompt;
+  delete kept.promptBase;
+  const image = (await deps.catalogue()).byId.get(imageId)!;
   // A redo of something already made counts; a first try after a failure or a refusal is not a redo.
   if (entry.reviewUrl || entry.status === "approved" || entry.status === "rejected") kept.redos = (entry.redos ?? 0) + 1;
   const next: FactoryEntry = {
@@ -590,6 +602,8 @@ export async function redo(deps: FactoryDeps, imageId: string, prompt?: string |
     queuedAt: nowOf(deps).toISOString(),
     // `null` goes back to the catalogue's own words; a string of 3+ characters replaces them; absent keeps any earlier edit.
     ...(prompt === null ? {} : edited.length >= 3 ? { prompt: edited } : entry.prompt ? { prompt: entry.prompt } : {}),
+    // The catalogue's words at the first edit, kept while the edit stands: the export's baseline for conflicts.
+    ...(prompt !== null && (edited.length >= 3 || entry.prompt) ? { promptBase: entry.promptBase ?? image.prompt } : {}),
     ...(options.provider ? { useProvider: options.provider } : {}),
   };
   await deps.store.save(next);
@@ -614,7 +628,8 @@ export async function setText(deps: FactoryDeps, imageId: string, text: string |
   const image = (await deps.catalogue()).byId.get(imageId);
   if (!image) return { ok: false, code: "art-job-unknown", message: "The catalogue no longer lists that item." };
   const clean = text === null ? "" : text.replace(/\s+/g, " ").trim().slice(0, 500);
-  await deps.store.setText(imageId, clean ? clean : null);
+  const catalogueText = (isSound(kindOf(image)) ? image.caption : image.alt) ?? "";
+  await deps.store.setText(imageId, clean ? clean : null, catalogueText);
   return { ok: true, text: textFor(image, await deps.store.texts()) };
 }
 

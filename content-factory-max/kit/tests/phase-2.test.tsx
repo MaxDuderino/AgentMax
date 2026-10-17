@@ -6,7 +6,7 @@ import { groupsFromFile, jsonCatalogue, type CatalogueFile } from "../lib/art-fa
 import { softenWords } from "../lib/art-factory/core/soften";
 import { indexCatalogue } from "../lib/art-factory/core/types";
 import { MemoryArtStore } from "../lib/art-factory/server/art-store";
-import { approve, enqueue, redo, work, type FactoryDeps } from "../lib/art-factory/server/factory-service";
+import { approve, enqueue, redo, reject, work, type FactoryDeps } from "../lib/art-factory/server/factory-service";
 import { FactoryStore } from "../lib/art-factory/server/factory-store";
 import { createHandlers } from "../lib/art-factory/server/handlers";
 import type { ImageProvider } from "../lib/art-factory/server/image-provider";
@@ -73,6 +73,40 @@ describe("redo counts, draws and refusals", () => {
     await approve(deps, heart);
     await redo(deps, heart);
     expect((await store.entry(heart))!).toMatchObject({ redos: 2, draws: 2, status: "queued" });
+  });
+
+  it("queueing a rejected item again counts as a redo; retrying a failed one does not", async () => {
+    const { deps, store, openai } = setup();
+    await enqueue(deps, [heart]);
+    await work(deps);
+    await reject(deps, heart);
+    await enqueue(deps, [heart]);
+    expect((await store.entry(heart))!).toMatchObject({ status: "queued", redos: 1, draws: 1 });
+    openai.next = [1, 2, 3].map(() => ({ ok: false as const, code: "art-failed" as const, detail: "boom" }));
+    for (let i = 0; i < 3; i += 1) await work(deps);
+    expect((await store.entry(heart))!.status).toBe("failed");
+    await enqueue(deps, [heart]);
+    expect((await store.entry(heart))!.redos).toBe(1);
+  });
+
+  it("an edit remembers the catalogue's words it replaced, through requeues, until it goes back to the catalogue's", async () => {
+    const { deps, store } = setup();
+    await enqueue(deps, [heart]);
+    await work(deps);
+    await redo(deps, heart, "A heart made of jelly.");
+    const base = "A glossy red heart, slightly squashed like a gummy sweet, with a white highlight.";
+    expect((await store.entry(heart))!).toMatchObject({ prompt: "A heart made of jelly.", promptBase: base });
+    await work(deps);
+    await redo(deps, heart, "A heart made of lime jelly.");
+    expect((await store.entry(heart))!.promptBase).toBe(base);
+    await work(deps);
+    await reject(deps, heart);
+    await enqueue(deps, [heart]);
+    expect((await store.entry(heart))!.promptBase).toBe(base);
+    await redo(deps, heart, null).catch(() => undefined);
+    await work(deps);
+    await redo(deps, heart, null);
+    expect((await store.entry(heart))!.promptBase).toBeUndefined();
   });
 
   it("try the other provider: that one draws it, once, and the next redo goes back to the switcher", async () => {
@@ -166,8 +200,8 @@ describe("the doors for phase 2", () => {
     const file = await response.json();
     expect(file).toMatchObject({ kind: "content-factory-prompt-fixes", version: 1, project: "Space Snacks" });
     expect(file.fixes).toEqual([{ id: heart, assetId: "heart", prompt: "A heart made of jelly.", original: "A glossy red heart, slightly squashed like a gummy sweet, with a white highlight.", status: "queued" }]);
-    expect(file.texts).toEqual([{ id: heart, assetId: "heart", field: "alt", text: "A jelly heart." }]);
-    expect(file.styles).toEqual({ "Interface icons": "Pixel art." });
+    expect(file.texts).toEqual([{ id: heart, assetId: "heart", field: "alt", text: "A jelly heart.", original: "A glossy red gummy heart." }]);
+    expect(file.styles).toEqual([{ family: "Interface icons", text: "Pixel art.", original: expect.stringMatching(/^House style for Space Snacks icons/) }]);
     // Admins only, like every factory door.
     expect((await build().handlers.factoryGet(new Request(`${site}/api/admin/art-factory?export=fixes`))).status).toBe(404);
   });
@@ -232,5 +266,10 @@ describe("the grid and review mode render", () => {
     expect(html).toContain("Soften the words");
     expect(html).toContain("Try Google instead");
     expect(html).not.toContain("Try OpenAI instead");
+    // A refused sound is made by its kind's maker, so switching picture makers would do nothing: Soften only.
+    const sound = { ...images.get("sounds/effects/star-pickup")!.image };
+    const soundHtml = renderToStaticMarkup(<RefusalHelper entry={{ ...entries["icons/ui/star"]!, imageId: sound.id }} image={sound} others={["openai", "google"]} onDone={() => undefined} />);
+    expect(soundHtml).toContain("Soften the words");
+    expect(soundHtml).not.toContain("instead");
   });
 });

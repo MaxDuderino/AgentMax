@@ -207,7 +207,7 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
       }
       if (url.searchParams.get("export") === "fixes") {
         // Prompt fixes made here, for the project's own prompts.json (Max: versioned, in the project's own list, never the template).
-        const [entries, texts, styles] = await Promise.all([factory.store.entries(), factory.store.texts(), factory.store.styles()]);
+        const [entries, texts, styles, textBases, styleBases] = await Promise.all([factory.store.entries(), factory.store.texts(), factory.store.styles(), factory.store.textBases(), factory.store.styleBases()]);
         const assetOf = (id: string) => id.split("/").pop() ?? id;
         const exported = {
           kind: "content-factory-prompt-fixes",
@@ -217,11 +217,16 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
           note: "Merge into this project's assets/prompts.json with Asset Forge's merge_fixes.py. Each change becomes a new numbered version; the old words are kept.",
           fixes: entries
             .filter((one) => one.prompt && byId.has(one.imageId))
-            .map((one) => ({ id: one.imageId, assetId: assetOf(one.imageId), prompt: one.prompt!, original: byId.get(one.imageId)!.prompt, status: one.status })),
+            // `original` is the catalogue's words when the edit was made, so a prompts.json change since then is a conflict, not overwritten.
+            .map((one) => ({ id: one.imageId, assetId: assetOf(one.imageId), prompt: one.prompt!, original: one.promptBase ?? byId.get(one.imageId)!.prompt, status: one.status })),
           texts: Object.entries(texts)
             .filter(([id]) => byId.has(id))
-            .map(([id, text]) => ({ id, assetId: assetOf(id), field: isSound(kindOf(byId.get(id)!)) ? "caption" : "alt", text })),
-          styles: Object.fromEntries(groups.filter((group) => styles[group.id] !== undefined).map((group) => [group.title, styles[group.id]!])),
+            .map(([id, text]) => {
+              const image = byId.get(id)!;
+              const sound = isSound(kindOf(image));
+              return { id, assetId: assetOf(id), field: sound ? "caption" : "alt", text, original: textBases[id] ?? (sound ? image.caption : image.alt) ?? "" };
+            }),
+          styles: groups.filter((group) => styles[group.id] !== undefined).map((group) => ({ family: group.title, text: styles[group.id]!, original: styleBases[group.id] ?? group.style ?? "" })),
         };
         const name = `${factory.config.prefix}-prompt-fixes-${exported.exportedAt.slice(0, 10)}.json`;
         return new Response(`${JSON.stringify(exported, null, 2)}\n`, { headers: { "content-type": "application/json; charset=utf-8", "content-disposition": `attachment; filename="${name}"`, ...noStore } });
@@ -362,8 +367,8 @@ export function createHandlers(factory: ArtFactory): ArtFactoryHandlers {
           if (typeof body.group !== "string" || !groups.some((group) => group.id === body.group)) return bad("invalid", "Which group?");
           const text = body.text === null ? null : typeof body.text === "string" ? body.text.trim().slice(0, 2000) : undefined;
           if (text === undefined) return bad("invalid", "The style is some words, or nothing to go back to the default.");
-          await factory.store.setStyle(body.group, text === "" ? null : text);
           const group = groups.find((one) => one.id === body.group)!;
+          await factory.store.setStyle(body.group, text === "" ? null : text, group.style ?? "");
           return json({ group: body.group, style: styleFor(group, await factory.store.styles()) });
         }
         case "settings": {

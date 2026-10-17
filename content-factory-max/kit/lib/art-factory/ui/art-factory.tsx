@@ -222,7 +222,11 @@ export function ArtFactory() {
   for (const { image } of images.values()) byKind.set(image.kind, (byKind.get(image.kind) ?? 0) + 1);
   const kindLine = [...byKind].map(([kind, count]) => `${count} ${count === 1 ? kindWords[kind].one : kindWords[kind].many}`).join(" · ");
   const noText = [...images.values()].filter(({ image }) => !image.text);
-  const edited = Object.values(state.entries).filter((one) => one.prompt).length;
+  // Everything the export carries: edited words, alt text and captions, and group styles.
+  const edited =
+    Object.values(state.entries).filter((one) => one.prompt).length +
+    [...images.values()].filter(({ image }) => image.textEdited).length +
+    state.groups.filter((one) => one.styleEdited).length;
   // Sounds waiting with nothing switched on to make them, so the page can say so before a run stalls.
   const stuckKinds = (["voice", "sfx", "music"] as const).filter((kind) => !state.makers?.[kind] && [...images.values()].some(({ image }) => image.kind === kind && state.entries[image.id]?.status === "queued"));
 
@@ -343,7 +347,7 @@ export function ArtFactory() {
         <MakeArtLimit />
         {edited ? (
           <p className="af-small">
-            {edited} {edited === 1 ? "item has" : "items have"} words edited here.{" "}
+            {edited} {edited === 1 ? "edit" : "edits"} made here (words, alt text, captions or styles).{" "}
             <a className="af-btn" href={`${artApi.factory}?export=fixes`} download>
               <span aria-hidden="true">⬇ </span>Export prompt fixes
             </a>{" "}
@@ -364,7 +368,7 @@ export function ArtFactory() {
       <section className="af-card" aria-labelledby="af-tray">
         <div className="af-spread">
           <h2 id="af-tray" tabIndex={-1}>Review tray {review.length ? `· ${review.length}` : ""}</h2>
-          {review.length > 0 ? (
+          {review.length > 0 || reviewing ? (
             <button type="button" id="af-review-toggle" className="af-btn" aria-pressed={reviewing} onClick={() => setReviewing(!reviewing)}>
               {reviewing ? "Back to cards" : "Review mode (keys)"}
             </button>
@@ -398,7 +402,8 @@ export function ArtFactory() {
             </ul>
           </div>
         ) : null}
-        {reviewing && review.length > 0 ? (
+        {/* Review mode stays open on its "all reviewed" screen until it is closed, so focus never falls out of the tray. */}
+        {reviewing ? (
           <ReviewMode
             review={review}
             images={images}
@@ -412,11 +417,13 @@ export function ArtFactory() {
             onClose={() => {
               setReviewing(false);
               // Back to where review mode was opened from, not the top of the page.
-              requestAnimationFrame(() => document.getElementById("af-review-toggle")?.focus());
+              requestAnimationFrame(() => (document.getElementById("af-review-toggle") ?? document.getElementById("af-tray"))?.focus());
             }}
           />
         ) : null}
-        <div className="af-grid" hidden={reviewing}>
+        {/* Only one review interface at a time: the cards are not mounted while review mode is open. */}
+        {!reviewing ? (
+        <div className="af-grid">
           {review.map((entry) => {
             const found = images.get(entry.imageId);
             return found ? (
@@ -424,6 +431,7 @@ export function ArtFactory() {
             ) : null;
           })}
         </div>
+        ) : null}
         {failed.length > 0 ? (
           <details>
             <summary className="af-bad-text">{failed.length} failed: see why</summary>

@@ -223,12 +223,21 @@ export function ReviewMode({
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [said, setSaid] = useState("");
-  const [editing, setEditing] = useState<string | null>(null);
+  // A draft of new words belongs to one item: moving on, or an answer arriving late for another, never carries it over.
+  const [draft, setDraft] = useState<{ id: string; text: string } | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const wordsRef = useRef<HTMLTextAreaElement>(null);
   const at = Math.min(index, Math.max(0, review.length - 1));
   const entry = review[at];
   const found = entry ? images.get(entry.imageId) : undefined;
+  const currentId = useRef<string | null>(null);
+  currentId.current = entry?.imageId ?? null;
+  const editing = draft && draft.id === entry?.imageId ? draft.text : null;
+  const setEditing = (text: string | null) => setDraft(text === null || !entry ? null : { id: entry.imageId, text });
+  const move = (to: number) => {
+    setDraft(null);
+    setIndex(to);
+  };
 
   useEffect(() => {
     boxRef.current?.focus();
@@ -242,7 +251,8 @@ export function ReviewMode({
     setBusy(true);
     const answer = await post<{ warning?: string }>({ ...body, id: entry.imageId });
     setBusy(false);
-    setEditing(null);
+    // A failed request keeps the draft, so the words can be sent again.
+    if (answer.ok) setDraft(null);
     const left = review.length - 1;
     const next = review[at + 1] ?? review[at - 1];
     const nextName = next ? images.get(next.imageId) : undefined;
@@ -271,16 +281,18 @@ export function ReviewMode({
     else if (key === "x") void decide({ action: "reject" }, "Rejected.");
     else if (key === "r") void decide({ action: "redo" }, "Back in the queue.");
     else if (key === "e") void openWords();
-    else if (event.key === "ArrowRight") setIndex(Math.min(review.length - 1, at + 1));
-    else if (event.key === "ArrowLeft") setIndex(Math.max(0, at - 1));
+    else if (event.key === "ArrowRight") move(Math.min(review.length - 1, at + 1));
+    else if (event.key === "ArrowLeft") move(Math.max(0, at - 1));
     else return;
     event.preventDefault();
   }
 
   async function openWords() {
     if (!entry) return;
-    const body = await read<{ own?: string }>(`${artApi.factory}?prompt=${encodeURIComponent(entry.imageId)}`);
-    setEditing(body?.own ?? "");
+    const id = entry.imageId;
+    const body = await read<{ own?: string }>(`${artApi.factory}?prompt=${encodeURIComponent(id)}`);
+    // Only if the same item is still showing: a late answer must not fill another item's editor.
+    if (currentId.current === id) setDraft({ id, text: body?.own ?? "" });
   }
 
   const set = found ? found.job.images : [];
@@ -386,7 +398,8 @@ export function RefusalHelper({ entry, image, others, onDone }: { entry: Entry; 
   const [soft, setSoft] = useState<{ text: string; changes: { from: string; to: string }[] } | null>(null);
   const [busy, setBusy] = useState(false);
   const label = (name: string) => (name === "openai" ? "OpenAI" : name === "google" ? "Google" : name);
-  const other = others.filter((one) => one !== entry.provider);
+  // "Try the other one" switches picture makers; a sound's maker is chosen by its kind, so sounds only get Soften.
+  const other = isSoundKind(image.kind) ? [] : others.filter((one) => one !== entry.provider);
 
   async function redo(body: Record<string, unknown>, done: string) {
     setBusy(true);

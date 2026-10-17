@@ -19,6 +19,7 @@ So it refuses to write into AgentMax or MaxTemplateWithAgents.
   - --dry-run says what would change and writes nothing.
 """
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -60,7 +61,19 @@ if fixes.get("kind") != "content-factory-prompt-fixes":
     print(f"{fixes_path} is not a Content Factory MAX prompt-fixes export.")
     sys.exit(2)
 when = fixes.get("exportedAt") or datetime.now(timezone.utc).isoformat()
-assets = {str(a.get("id")): a for a in data.get("assets", [])}
+def catalogue_id(raw):
+    """The id build_catalogue.py gives an asset in the factory (it swaps anything but letters, digits, - and _ for -)."""
+    return re.sub(r"[^A-Za-z0-9_-]+", "-", str(raw)).strip("-")
+
+
+# Found by the id the factory exported (the catalogue's form), whatever the asset's id looks like in prompts.json.
+assets = {}
+for a in data.get("assets", []):
+    key = catalogue_id(a.get("id") or Path(str(a.get("file") or "")).stem)
+    if key in assets:
+        print(f"Not merged: two assets in prompts.json both become the id {key} in the factory. Give one a different id first.")
+        sys.exit(1)
+    assets[key] = a
 
 
 def new_version(asset, field, value, note):
@@ -72,49 +85,68 @@ def new_version(asset, field, value, note):
     asset[field] = value
 
 
+def conflicted(current, original, new):
+    """Both sides changed it: prompts.json no longer says what it said when the edit was made, nor the new words."""
+    return current is not None and current.strip() not in (original.strip(), new.strip()) and not FORCE
+
+
 changed, same, conflicts, missing = [], 0, [], []
 for fix in fixes.get("fixes", []):
-    asset = assets.get(str(fix.get("assetId")))
+    asset = assets.get(catalogue_id(fix.get("assetId", "")))
     if asset is None:
         missing.append(fix.get("id"))
         continue
-    current = asset.get("prompt", "").strip()
-    if current == fix["prompt"].strip():
+    current = asset.get("prompt", "")
+    if current.strip() == fix["prompt"].strip():
         same += 1
         continue
-    if current != fix.get("original", "").strip() and not FORCE:
+    if conflicted(current, fix.get("original", ""), fix["prompt"]):
         conflicts.append(fix["id"])
         continue
     new_version(asset, "prompt", fix["prompt"].strip(), "edited in Content Factory MAX")
     changed.append(f'{asset["id"]}: words, now version {asset["version"]}')
 
 for text in fixes.get("texts", []):
-    asset = assets.get(str(text.get("assetId")))
+    asset = assets.get(catalogue_id(text.get("assetId", "")))
     field = text.get("field") if text.get("field") in ("alt", "caption") else "alt"
     if asset is None:
         missing.append(text.get("id"))
         continue
-    if asset.get(field, "").strip() == text["text"].strip():
+    # An asset with no alt or caption of its own had a draft from build_catalogue.py: nothing on this side to clash with.
+    current = asset.get(field)
+    if (current or "").strip() == text["text"].strip():
         same += 1
+        continue
+    if conflicted(current, text.get("original", ""), text["text"]):
+        conflicts.append(f'{text["id"]} ({field})')
         continue
     new_version(asset, field, text["text"].strip(), f"{field} edited in review")
     changed.append(f'{asset["id"]}: {field}, now version {asset["version"]}')
 
 factory = data.setdefault("factory", {})
 styles = factory.setdefault("styles", {})
-for family, text in (fixes.get("styles") or {}).items():
-    if styles.get(family, "").strip() == text.strip():
+exported_styles = fixes.get("styles") or []
+if isinstance(exported_styles, dict):  # an export from before baselines were kept: no original, so any difference is a conflict
+    exported_styles = [{"family": family, "text": text, "original": None} for family, text in exported_styles.items()]
+for style in exported_styles:
+    family, text = style["family"], style["text"]
+    current = styles.get(family)
+    if (current or "").strip() == text.strip():
         same += 1
         continue
+    # No style of its own in prompts.json means the group used STYLE.md's: nothing on this side to clash with.
+    if current is not None and style.get("original") is None and not FORCE or conflicted(current, style.get("original") or "", text):
+        conflicts.append(f"style block for {family}")
+        continue
     old = factory.setdefault("styleHistory", {}).setdefault(family, [])
-    old.append({"v": len(old) + 1, "style": styles.get(family, ""), "replaced": when})
+    old.append({"v": len(old) + 1, "style": current or "", "replaced": when})
     styles[family] = text.strip()
     changed.append(f"style block for {family}, now version {len(old) + 1}")
 
 for line in changed:
     print(("Would change  " if DRY else "Changed  ") + line)
 if conflicts:
-    print(f"Skipped {len(conflicts)} where prompts.json changed since the export too (both sides edited): {', '.join(conflicts)}. Check them by hand, or run again with --force to take the factory's words.")
+    print(f"Skipped {len(conflicts)} where prompts.json changed since the edit was made too (both sides edited): {', '.join(conflicts)}. Check them by hand, or run again with --force to take the factory's.")
 if missing:
     print(f"{len(missing)} are not in prompts.json (computed or batch items, or removed): {', '.join(str(m) for m in missing)}.")
 print(f"{len(changed)} change(s), {same} already the same.")
