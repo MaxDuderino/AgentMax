@@ -1,8 +1,7 @@
-# Status · 2026-10-17 · v1.3 (phase 2 on its own PR, not merged)
+# Status · 2026-10-17 · v1.3 (merged)
 **Where we are:** **AgentMax v1.0 + Content Factory MAX phases 1 and 2.** 14 agents: 13 ✅ proven, plus **Content Factory MAX** (was the Art Factory; 🧪 tested in a fresh Next.js app, not yet in one of Max's projects). The template's code kit is now `starter/kits/content-factory-max/`. New builds start from the MaxTemplateWithAgents template.
 **Next up:** Content Factory MAX phase 3, the Sound Stage (port DnD-Max's Voices studio; real voice, effect and music makers), then phase 4 (themes, group-finished banner).
 **Waiting on Max:**
-- Merge the phase 2 PR when happy.
 - DnD-Max's live factory has the same 3-minute lease bug the BVD found (a slow picture can be paid for twice at 2+ lanes): fix it in the DnD-Max repo.
 - Delete the QA sample branch `docs/agentmax-qa-2026-10-15` in DnD-Max (GitHub → Branches → trash icon) and test table QXT-RZN on the live site.
 - Check push protection on DnD-Max.
@@ -10,6 +9,16 @@
 # Progress Log
 
 Newest on top. Each entry quotes the request that caused it.
+
+---
+
+## 2026-10-17 · Shipped phase 2: PR #4 merged, lineup reinstalled, template updated
+
+> "Merge PR #4 into main." · "Update PROGRESS.md's status, re-run install.ps1, and copy the phase 2 starter/ into MaxTemplateWithAgents."
+
+- AgentMax PR #4 merged (phase 2, plus fixes for 10 review comments: merge ids normalized, conflict baselines for words, alt text and styles, rejected requeues count as redos, review-mode focus and drafts, Try another provider for pictures only; 108 kit tests).
+- Ran `install.ps1`: `~/.claude` has the new kit and Asset Forge's `merge_fixes.py`; RULES.md copy refreshed.
+- MaxTemplateWithAgents PR #2 merged: new projects ship kit 1.2.0.
 
 ---
 
