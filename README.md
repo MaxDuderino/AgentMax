@@ -21,8 +21,8 @@ That's Session Kickoff. It reads where the project stands, offers the next moves
 | **QA Team** | Henry's crew: smoke test, bugs, hollow features, keyboard pass | "QA the site" |
 | **Focus Group** | 9 testers from Noob to Screen Reader User | "playtest this" |
 | **Deploy Doctor** | Broken Vercel deploys, diagnosed | "the deploy broke" |
-| **Asset Forge** | Style bible and art list; feeds the Art Factory, or a copy queue for ChatGPT | "I need art for..." |
-| **Art Factory** | Puts the in-app art factory + AI cost tracker into any project | "set up the art factory" |
+| **Asset Forge** | Style bible and art list; feeds Content Factory MAX, or a copy queue for ChatGPT | "I need art for..." |
+| **Content Factory MAX** | Puts the in-app studio (pictures, voices, sound effects, music on one queue) + AI cost tracker into any project | "set up the content factory" (or "the art factory") |
 | **Translator / Scribe** | Plain English, the log (inside the Wrap) | "explain that" / "log it" |
 | **Handoff Packer** | A brief to take to another tool | "pack it up" |
 
@@ -30,7 +30,7 @@ The full sheet, with what's proven and what isn't yet, is in **LINEUP.md**. The 
 
 ## Install
 
-**Code kits:** `starter/kits/` holds code the template ships, starting with the **Art Factory kit** (DnD-Max's art factory, made reusable). The `art-factory` skill installs it into any project.
+**Code kits:** `starter/kits/` holds code the template ships, starting with the **Content Factory MAX kit** (DnD-Max's Art Factory, made reusable and media-neutral). The `content-factory-max` skill installs it into any project.
 
 Step by step, for every tool: **INSTALL.md**. Every command on one page: **COMMANDS.md**. To update later: `update.ps1` (Windows) or `update.sh`. New project? Start from the **MaxTemplateWithAgents** template.
 

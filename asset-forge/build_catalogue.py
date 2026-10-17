@@ -1,9 +1,9 @@
-"""Builds art-catalogue.json, the Art Factory's list of what to make, from prompts.json.
+"""Builds art-catalogue.json, Content Factory MAX's list of what to make, from prompts.json.
 
 Usage:  python build_catalogue.py assets/prompts.json art/art-catalogue.json [--all]
 
 prompts.json stays the one source of truth. This writes the catalogue the
-in-app Art Factory reads (the art-factory kit), the same way build_queue.py
+in-app Content Factory MAX reads (the content-factory-max kit), the same way build_queue.py
 writes the ChatGPT queue. Never edit the catalogue by hand: change
 prompts.json and run this again.
 
@@ -15,6 +15,13 @@ prompts.json and run this again.
   - The optional "factory" block in prompts.json sets size presets and a
     style block per family. Without one, the style block comes from STYLE.md
     ("## Style block") and sizes from each asset's shape.
+  - "kind" on an asset (image, voice, sfx, music; default image) makes it a
+    sound: no sizes, saved as <file>.<mp3|wav|ogg>, with "seconds", "loop"
+    and "voice" handed to the maker.
+  - Alt text and captions are drafted for Max to edit in review (Max,
+    2026-10-16): an asset's own "alt" / "caption" if it has one, else the
+    prompt's first sentence for a picture, the line itself for a voice, and
+    the name in brackets for an effect or music.
 """
 import json
 import re
@@ -43,6 +50,36 @@ SHAPE_SIZES = {
 def slug(text, fallback="item"):
     s = re.sub(r"[^a-z0-9]+", "-", str(text).lower()).strip("-")
     return s or fallback
+
+
+KINDS = ("image", "voice", "sfx", "music")
+SOUND_FORMATS = ("mp3", "wav", "ogg")
+
+
+def first_sentence(text, limit=160):
+    """The opening sentence of a prompt, as a first draft of a picture's alt text."""
+    words = re.sub(r"\s+", " ", str(text)).strip()
+    head = re.split(r"(?<=[.!?])\s", words, maxsplit=1)[0]
+    head = re.split(r"\b(?:in the style of|style:|art style|rendered|digital painting|trending on)\b", head, flags=re.I)[0].strip(" ,;:-")
+    # Drawing instructions say how to draw it, not what it shows: no help to someone listening.
+    head = re.sub(r",?\s*\b(?:on\s+)?(?:a\s+)?(?:fully\s+)?(?:transparent|white|plain|solid|clear)\s+(?:back)?ground\b|,?\s*\bno (?:text|borders?|shadows?)\b|,?\s*\bcent(?:er|re)d\b|,?\s*\bhigh(?:ly)? detail(?:ed)?\b", "", head, flags=re.I).strip(" ,;:-")
+    if len(head) > limit:
+        head = head[: limit - 1].rsplit(" ", 1)[0] + "…"
+    if head and head[-1] not in ".!?…":
+        head += "."
+    return head[:1].upper() + head[1:]
+
+
+def draft_text(asset, kind, name):
+    """Alt text (picture) or caption (sound): the asset's own, else a draft."""
+    if kind == "image":
+        return (asset.get("alt") or "").strip() or first_sentence(asset.get("prompt", ""))
+    own = (asset.get("caption") or "").strip()
+    if own:
+        return own
+    if kind == "voice":
+        return re.sub(r"\s+", " ", asset.get("prompt", "")).strip()
+    return f"[{name}]"
 
 
 def style_from_bible():
@@ -87,7 +124,11 @@ for asset in data.get("assets", []):
     if not asset.get("prompt", "").strip():
         problems.append(f'{asset.get("id")}: no prompt')
         continue
-    if isinstance(asset.get("sizes"), str) and asset["sizes"] not in factory.get("sizes", {}):
+    kind = asset.get("kind") or "image"
+    if kind not in KINDS:
+        problems.append(f'{asset.get("id")}: kind "{kind}" is not one of {", ".join(KINDS)}')
+        continue
+    if kind == "image" and isinstance(asset.get("sizes"), str) and asset["sizes"] not in factory.get("sizes", {}):
         problems.append(f'{asset.get("id")}: size preset "{asset["sizes"]}" is not in the factory block sizes')
         continue
     family = asset.get("family") or "Other"
@@ -95,6 +136,7 @@ for asset in data.get("assets", []):
     file = re.sub(r"^\.?/?public/", "", file)
     folder, _, name = file.rpartition("/")
     stem = re.sub(r"\.[a-z0-9]+$", "", name, flags=re.I)
+    extension = name[len(stem) + 1:].lower()
     image_id = re.sub(r"[^A-Za-z0-9_-]+", "-", str(asset.get("id") or stem)).strip("-")
     if image_id in seen_ids:
         problems.append(f"two assets have the id {image_id}")
@@ -107,7 +149,24 @@ for asset in data.get("assets", []):
         group["style"] = style
     job_id = slug(folder or "art", "art")
     job = group["jobs"].setdefault(job_id, {"id": job_id, "title": f"{family}: {folder or 'art'}", "dir": folder or "art", "images": []})
-    image = {"id": image_id, "name": asset.get("name") or stem, "file": stem, "prompt": asset["prompt"].strip(), "sizes": sizes_for(asset)}
+    shown = asset.get("name") or stem
+    image = {"id": image_id, "name": shown, "file": stem, "prompt": asset["prompt"].strip()}
+    if kind == "image":
+        image["sizes"] = sizes_for(asset)
+        text = draft_text(asset, kind, shown)
+        if text:
+            image["alt"] = text
+    else:
+        image["kind"] = kind
+        fmt = asset.get("format") or (extension if extension in SOUND_FORMATS else "mp3")
+        if fmt not in SOUND_FORMATS:
+            problems.append(f'{asset.get("id")}: sound format "{fmt}" is not one of {", ".join(SOUND_FORMATS)}')
+            continue
+        image["format"] = fmt
+        for field in ("seconds", "loop", "voice"):
+            if asset.get(field) not in (None, ""):
+                image[field] = asset[field]
+        image["caption"] = draft_text(asset, kind, shown)
     groups[group_id] = group
     job["images"].append(image)
 
@@ -128,5 +187,8 @@ if factory.get("root"):
     catalogue["root"] = factory["root"]
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps(catalogue, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-made = sum(len(j["images"]) for g in catalogue["groups"] for j in g["jobs"])
-print(f"Wrote {out}: {made} pictures in {len(catalogue['groups'])} groups ({skipped} done or skipped left out).")
+items = [i for g in catalogue["groups"] for j in g["jobs"] for i in j["images"]]
+sounds = sum(1 for i in items if i.get("kind", "image") != "image")
+drafted = sum(1 for i in items if i.get("alt") or i.get("caption"))
+print(f"Wrote {out}: {len(items) - sounds} pictures and {sounds} sounds in {len(catalogue['groups'])} groups ({skipped} done or skipped left out). "
+      f"Alt text or captions on {drafted} of {len(items)}: drafts, for Max to check in review.")

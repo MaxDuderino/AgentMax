@@ -1,8 +1,9 @@
-# Status · 2026-10-16 · v1.1 (on PR #2, not merged)
-**Where we are:** **AgentMax v1.0 + the Art Factory.** 14 agents: 13 ✅ proven, plus the new **Art Factory** (🧪 tested in a fresh Next.js app, not yet in one of Max's projects). The template now ships its first code kit, `starter/kits/art-factory/`. New builds start from the MaxTemplateWithAgents template.
-**Next up:** build **Content Factory MAX** from the BVD plan (council/2026-10-16-art-factory-review.md), phase 1 first: the media-neutral engine and the safety nets.
+# Status · 2026-10-17 · v1.2 (on PR #2, not merged)
+**Where we are:** **AgentMax v1.0 + Content Factory MAX phase 1.** 14 agents: 13 ✅ proven, plus **Content Factory MAX** (was the Art Factory; 🧪 tested in a fresh Next.js app, not yet in one of Max's projects). The template's code kit is now `starter/kits/content-factory-max/`. New builds start from the MaxTemplateWithAgents template.
+**Next up:** Content Factory MAX phase 2 (working at 907-item scale: grid, review mode with keys, refusal helper, cost truth, versioned prompt fixes), then phase 3, the Sound Stage (real voice, effect and music makers).
 **Waiting on Max:**
 - Merge PR #2 when happy.
+- Run `install.ps1` again so `~/.claude` gets the renamed skill (it removes the old `art-factory` skill folder) and the refreshed RULES.md copy.
 - DnD-Max's live factory has the same 3-minute lease bug the BVD found (a slow picture can be paid for twice at 2+ lanes): fix it in the DnD-Max repo.
 - Copy `starter/` into MaxTemplateWithAgents so new projects get the kit.
 - Mark MaxTemplateWithAgents as a template on GitHub (Settings → tick "Template repository").
@@ -12,6 +13,36 @@
 # Progress Log
 
 Newest on top. Each entry quotes the request that caused it.
+
+---
+
+## 2026-10-17 · Content Factory MAX, phase 1: one engine for every kind, and the safety nets
+
+> "you know i want the full studio.... lol" · picked **Content Factory MAX** · **Keep old versions + Put back** and **Stop at zero + per-run limit** · **Asset Forge drafts, you edit in review** (Max's questionnaire answers, 2026-10-16)
+
+Built from phase 1 of the plan in `council/2026-10-16-art-factory-review.md`. Nothing in the DnD-Max repo was touched.
+
+**What changed**
+- **Renamed** the kit and skill: `starter/kits/content-factory-max/` and the `content-factory-max` skill ("art factory" still finds it). Updated build.py, LINEUP, README, COMMANDS, VISION, HANDOFF, AGENTS snippet, the starter README and both installers, which now remove the retired `art-factory` skill folder. The code inside keeps its `art-factory` paths on purpose, so a project that has the kit updates in place.
+- **Every catalogue item has a `kind`** (image, voice, sfx, music). Sounds have no sizes and land at `<dir>/<file>.mp3` (or wav/ogg), with `seconds`, `loop` and `voice`. Older computed lists with no kind are pictures.
+- **One `Maker` door** (`lib/art-factory/server/maker.ts`): makers say which kinds they make. OpenAI, Google and Practice pictures come through it unchanged. Projects can plug in their own sound makers via `makers` in the config. **Practice now makes free placeholder sounds** (real WAV beeps), so the whole sound flow can be rehearsed. A kind with nothing to make it waits in the queue and the page says why.
+- **Usage ledger: units and an open provider list.** Calls can record characters, seconds or pictures; prices can be per unit (set on the usage page too). Any provider id works (`suno`, `my-tts`). Old token rows read exactly as before.
+- **Safety nets, on by default:** re-approving keeps the live version in `art-factory/previous/…` with **↶ Put back** (which keeps the newer one, so you can swap back), tidied after 30 days; **stop at zero on** for every new wallet; a **per-run spending limit** ($5, beside the pace; empty = none).
+- **Approve is resumable:** every file written first, then all recorded; Approve again after an interruption carries on and never keeps the new picture as "previous". A failed on-approve hook is marked on the item with **↻ Tell the app again**.
+- **Alt text and captions** in the catalogue (a voice line's caption defaults to its line), editable on every review card, served at `/api/art/text`, and handed back by `artSrc(path, { withText: true })`. **Asset Forge's `build_catalogue.py` drafts them** (prompt's first sentence minus drawing instructions; name in brackets for effects; the line for voices) and passes `kind` and sound fields through.
+- The review tray plays sounds with a named player that never autoplays. The example catalogue gained a small "Sounds" group.
+
+**Checked**
+- Kit tests: 95 pass (23 new, one per item above, including an interrupted approve, Put back, the 30-day tidy, the run limit, units and stop-at-zero). `npx tsc --noEmit` clean. `python tools/build.py --check` clean.
+- Asset Forge: built a catalogue from a test prompts.json with pictures, an effect and a voice; the kit's own check accepted it.
+- **Fresh Next.js 16.3.2 app:** installer added every file (including the new `/api/art/text` route and `maker.ts`), `tsc` and `next build` clean. On a real `next start` server (signed in with a throwaway test password, memory only): Practice made a picture, a sound effect and a voice line; approved them; the sound was served as a real WAV; re-approving kept the previous picture and Put back swapped it in. In the browser: the tray shows a full-width labelled player that never autoplays, captions and alt text save from the keyboard. Found and fixed one bug there: the players were squished to a third of the card.
+- Test data: everything lived in that throwaway app's memory; nothing touched a live site.
+
+**Not done / not checked**
+- No real voice, effect or music maker yet (phase 3). No real provider call was made; all tests use fakes.
+- One test stub was wrong at first: two versions kept in the same millisecond shared a folder. That was a real (if rare) clash, so each kept version now gets its own folder.
+- A run with several lanes can pass its limit by about one picture per lane.
+- `starter/` not yet copied into MaxTemplateWithAgents (another repo).
 
 ---
 

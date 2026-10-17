@@ -25,8 +25,8 @@ Honest by rule: an agent is only ✅ once it has done a real job.
 | **QA Team** | Henry + Smoke Tester, Bug Wrangler, Hollow-Feature Audit | After deploys, "is it done?" | ✅ Proven 2026-10-15 (DnD-Max live play-through) |
 | **Focus Group** | 9 generic testers for any app or game | Only when Max asks | ✅ Proven 2026-10-15 (AgentMax install playtest; live-app run signed off by Max) |
 | **Deploy Doctor** | Vercel logs → diagnosis → proposed fix | A deploy breaks | ✅ Proven 2026-10-15 (Max's shakedown sign-off) |
-| **Asset Forge** | Style bible, prompts; feeds the Art Factory, or a clickable copy queue for ChatGPT | Art requests | ✅ Proven 2026-10-15 for the ChatGPT queue (Max's shakedown sign-off) · 🧪 factory catalogue tested on the example list 2026-10-16 |
-| **Art Factory** | Installs the in-app art factory, AI usage & cost tracker, Make art buttons and picture maker switcher (code kit in `starter/kits/art-factory/`) | Max, new projects, Asset Forge | 🧪 Tested 2026-10-16 (kit's own tests; installed into a fresh Next.js 16 app, built, and clicked through in Practice mode with a keyboard pass). Not yet run in one of Max's real projects |
+| **Asset Forge** | Style bible, prompts and drafted alt text; feeds Content Factory MAX, or a clickable copy queue for ChatGPT | Art requests | ✅ Proven 2026-10-15 for the ChatGPT queue (Max's shakedown sign-off) · 🧪 factory catalogue tested on the example list 2026-10-16 |
+| **Content Factory MAX** (was Art Factory) | Installs the in-app studio: pictures, voice lines, sound effects and music on one queue → review → approve engine, AI usage & cost tracker, Make art buttons and the maker switcher (code kit in `starter/kits/content-factory-max/`) | Max, new projects, Asset Forge | 🧪 Tested 2026-10-16 as the Art Factory (kit tests; fresh Next.js 16 app clicked through in Practice with a keyboard pass); phase 1 engine tested 2026-10-17 (kit tests, fresh-app install). Real sound makers come in phase 3. Not yet run in one of Max's real projects |
 | **Translator** | Plain-English change report | Inside the Wrap; on request | ✅ Proven 2026-10-15 (inside the Wrap) |
 | **Scribe** | Log entries, status overview, commit notes | Inside the Wrap; on request | ✅ Proven 2026-10-15 (inside the Wrap) |
 | **Handoff Packer** | Cross-tool HANDOFF.md | Only when Max asks | ✅ Proven 2026-10-15 (AgentMax HANDOFF.md) |
@@ -83,7 +83,7 @@ Folder `focus-group/`. Generic for any app or game: `{THING}` and `{HOST}` are f
 
 Start from the GitHub template **MaxTemplateWithAgents** ("Use this template"), then say "catch me up". The template's files come from `starter/` here, built from the same snippets, so they never go stale. To refresh the template after a lineup update, copy `starter/` into it.
 
-**Code kits** ship in the template too, under `starter/kits/`. The first is the **Art Factory kit**: DnD-Max's art factory and AI cost tracker, with the DnD-only parts swapped for a catalogue each project fills in. Say "set up the art factory" and the `art-factory` skill installs it and wires it to the project's art list from Asset Forge. Kit fixes are made in `starter/kits/`, then `python tools/build.py` copies the kit into the skill.
+**Code kits** ship in the template too, under `starter/kits/`. The first is the **Content Factory MAX kit**: DnD-Max's Art Factory and AI cost tracker, with the DnD-only parts swapped for a catalogue each project fills in, grown into one engine for pictures, voices, sound effects and music. Say "set up the content factory" (or "the art factory") and the `content-factory-max` skill installs it and wires it to the project's list from Asset Forge. Kit fixes are made in `starter/kits/`, then `python tools/build.py` copies the kit into the skill.
 
 ## Using it in each tool
 

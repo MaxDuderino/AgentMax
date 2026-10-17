@@ -12,7 +12,7 @@ Sources (edit these, never the generated files):
   focus-group/testers.json             the Focus Group crew
   qa-team/roles/*.md                   QA Team roles (except henry.md, which is generated)
   <skill>/SKILL.md                     every skill folder
-  starter/kits/<kit>/                  code kits shipped in the template (e.g. the Art Factory)
+  starter/kits/<kit>/                  code kits shipped in the template (e.g. Content Factory MAX)
 
 Generated:
   bvd/personas/NN-<slug>.md            portable persona files
@@ -23,7 +23,7 @@ Generated:
   dist/<skill>.zip                     one zip per skill for Claude chat (same bytes every build)
   dist/for-gpt-gemini/                 the paste-in kit for GPT, Gemini, AI Studio and other tools
   starter/CLAUDE.md, AGENTS.md, VISION.md   the template's generated files (the rest of starter/ is source)
-  art-factory/kit/                     a copy of starter/kits/art-factory, so the installed skill carries the code
+  content-factory-max/kit/             a copy of starter/kits/content-factory-max, so the installed skill carries the code
 """
 import io
 import json
@@ -270,7 +270,7 @@ for d in skills:
 
 # ------------------------------------------------ Paste-in kit for other AIs
 ORDER = ["session-kickoff", "wrap", "bvd", "vision-keeper", "checkpoint", "key-keeper", "translator", "scribe",
-         "qa-team", "focus-group", "deploy-doctor", "asset-forge", "art-factory", "handoff-packer"]
+         "qa-team", "focus-group", "deploy-doctor", "asset-forge", "content-factory-max", "handoff-packer"]
 names = [d.name for d in skills]
 ordered = [n for n in ORDER if n in names] + [n for n in names if n not in ORDER]
 

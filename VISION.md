@@ -23,9 +23,9 @@ _Written by Vision Keeper on 2026-10-15, from the handoff brief, the Soundcheck 
 | Rule Ledger | Trace every rule to its source, and flag the rest | Full |
 | Cross-tool kit | Use the same crew in ChatGPT, Gemini and VS | Full (Max's shakedown, 2026-10-15) |
 | Install | Get the whole crew onto a machine in a couple of minutes | Full: INSTALL.md, one-command update. Claude chat still takes one upload per skill. |
-| Asset Forge | Go from "I need art" to a consistent art list, made in the Art Factory or pasted into ChatGPT | Full for the ChatGPT queue (Max's shakedown); the factory catalogue is new |
+| Asset Forge | Go from "I need art" to a consistent art list, made in Content Factory MAX or pasted into ChatGPT | Full for the ChatGPT queue (Max's shakedown); the factory catalogue is new |
 | Deploy Doctor | Get a broken deploy diagnosed with a proposed fix | Full (Max's shakedown) |
-| Art Factory | Have DnD-Max's art factory and AI cost tracker in any project, making that project's own art list | Kit built and tested in a fresh Next.js app; not yet run in one of Max's real projects |
+| Content Factory MAX (was Art Factory) | Have DnD-Max's art factory and AI cost tracker in any project, making that project's own pictures, voices, sound effects and music | Phase 1 (media-neutral engine, safety nets) built and tested in a fresh Next.js app; real sound makers are phase 3; not yet run in one of Max's real projects |
 | Starter for new projects | Start any new build with the lineup's structure already in place | Full: MaxTemplateWithAgents, built from `starter/` |
 
 ## Never becomes

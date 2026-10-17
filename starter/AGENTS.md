@@ -23,8 +23,8 @@ Each agent is a section in that file. When Max names an agent or describes its j
 | QA Team | After a deploy; "is it really done?" |
 | Focus Group | Max wants players' reactions |
 | Deploy Doctor | A deploy or the live site broke |
-| Asset Forge | Art and image prompts; writes the Art Factory's catalogue |
-| Art Factory | Set up the in-app art factory and AI cost tracker in a project |
+| Asset Forge | Art and image prompts; writes Content Factory MAX's catalogue, alt text drafted |
+| Content Factory MAX | Set up the in-app studio (pictures and sounds) and AI cost tracker in a project ("the art factory") |
 | Translator, Scribe | Run inside Wrap; also on request |
 | Handoff Packer | Only when Max asks for a handoff |
 

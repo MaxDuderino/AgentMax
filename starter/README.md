@@ -22,6 +22,6 @@ _Started from **MaxTemplateWithAgents**: the Agent Lineup structure is built in.
 | `docs/testing/` | QA and playtest reports for this project live here |
 | `.gitignore` | Keeps `.env` and other secrets out of git |
 | `.env.example` | Names of the secrets this project needs, never the values |
-| `kits/art-factory/` | The **Art Factory kit**: in-app AI art factory, AI usage & cost tracker, Make art buttons. Not wired in yet: say "set up the art factory" once the app exists and the `art-factory` skill installs it |
+| `kits/content-factory-max/` | The **Content Factory MAX kit**: in-app AI studio for pictures and sounds, AI usage & cost tracker, Make art buttons. Not wired in yet: say "set up the content factory" (or "the art factory") once the app exists and the `content-factory-max` skill installs it |
 
 The crew itself (BVD, QA Team, Focus Group and the rest) is installed once on your machine from **AgentMax**, so every project always gets the latest version. Nothing here goes stale.
