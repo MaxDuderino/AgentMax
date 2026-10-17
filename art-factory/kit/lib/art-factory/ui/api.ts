@@ -34,4 +34,19 @@ export function artSrc(path: string): string {
   return `${artApi.made}${path.replace(/^\/+/, "").replace(/^public\//, "")}`;
 }
 
+/**
+ * Where to go after signing in: only a path on this site. Backslashes, control characters and anything a browser
+ * would read as another host (`//x`, `/\x`) fall back to the factory.
+ */
+export function safeNext(asked: string | null | undefined, fallback: string): string {
+  const value = asked ?? "";
+  if (!value.startsWith("/") || value.startsWith("//") || /[\\\u0000-\u001f\u007f\s]/.test(value)) return fallback;
+  try {
+    const parsed = new URL(value, "http://same.origin");
+    return parsed.origin === "http://same.origin" ? `${parsed.pathname}${parsed.search}${parsed.hash}` : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export const money = (usd: number | null | undefined) => (usd == null ? "no price yet" : usd < 0.1 ? `${(usd * 100).toFixed(1)}¢` : `$${usd.toFixed(2)}`);

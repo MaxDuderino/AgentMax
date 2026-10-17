@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 
-import { artApi, send } from "./api";
+import { artApi, safeNext, send } from "./api";
 
 /**
  * The frame around the kit's admin pages: a header with the project's name,
@@ -84,7 +84,7 @@ export function AdminLogin({ appName, next, mode }: { appName: string; next: str
                 setProblem(null);
                 const answer = await send(artApi.login, { password });
                 setBusy(false);
-                if (answer.ok) window.location.href = next;
+                if (answer.ok) window.location.href = safeNext(next, "/admin/art-factory");
                 else setProblem(answer.message);
               }}
             >

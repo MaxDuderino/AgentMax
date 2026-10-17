@@ -324,12 +324,17 @@ for kit in sorted(p for p in (ROOT / "starter/kits").iterdir() if p.is_dir()) if
         kit_copies[dest].add(rel)
         emit(rel, f.read_bytes())
 
+# A file removed from a kit is removed from its copy too, and never packed into the skill's zip.
+leftover = sorted(f.relative_to(ROOT).as_posix() for dest, keep in kit_copies.items() if (ROOT / dest).exists()
+                  for f in (ROOT / dest).rglob("*") if f.is_file() and f.relative_to(ROOT).as_posix() not in keep)
+
 # ------------------------------------------------- Skill zips (deterministic)
 def zip_bytes(folder, overrides):
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         files = {f.relative_to(ROOT).as_posix(): f for f in folder.rglob("*")
-                 if f.is_file() and f.suffix != ".docx" and "__pycache__" not in f.parts and "node_modules" not in f.parts}
+                 if f.is_file() and f.suffix != ".docx" and "__pycache__" not in f.parts and "node_modules" not in f.parts
+                 and f.relative_to(ROOT).as_posix() not in leftover}
         for rel in overrides:
             if rel.startswith(folder.name + "/"):
                 files[rel] = None
@@ -350,9 +355,6 @@ for d in skills:
 # ------------------------------------------------------------ write / check
 stale = [rel for rel, data in sorted(OUT.items())
          if not (ROOT / rel).exists() or (ROOT / rel).read_bytes() != data]
-# A file removed from a kit is removed from its copy too.
-leftover = sorted(f.relative_to(ROOT).as_posix() for dest, keep in kit_copies.items() if (ROOT / dest).exists()
-                  for f in (ROOT / dest).rglob("*") if f.is_file() and f.relative_to(ROOT).as_posix() not in keep)
 if CHECK:
     if stale or leftover:
         print(f"{len(stale) + len(leftover)} generated file(s) out of date. Run: python tools/build.py")

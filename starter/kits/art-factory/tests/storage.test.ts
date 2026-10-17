@@ -94,6 +94,7 @@ describe("the key-value memory", () => {
       },
       del: async () => 1,
       incr: async () => 7,
+      decr: async () => 6,
       expire: async () => 1,
       hget: async () => null,
       hgetall: async () => ({ n: 3, s: "x" }),

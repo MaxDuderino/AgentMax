@@ -89,7 +89,13 @@ const missing = wanted
   .filter((name) => name && !new RegExp(`^#?\\s*${name}=`, "m").test(have));
 if (missing.length) {
   note(`add    ${missing.length} variable names to .env.example (${missing.join(", ")})`);
-  if (!dry) writeFileSync(envExample, `${have.replace(/\s*$/, "")}${have ? "\n\n" : ""}${wanted}`);
+  // Only the lines for names the file does not have yet, so a project that already lists some never gets them twice.
+  const lines = wanted.split(/\r?\n/).filter((line) => {
+    const name = /^#?\s*([A-Z][A-Z0-9_]*[A-Za-z0-9]*)=/.exec(line)?.[1];
+    return name ? missing.includes(name) : false;
+  });
+  const block = ["# Art factory: names only, never values (Key Keeper).", ...lines].join("\n");
+  if (!dry) writeFileSync(envExample, `${have.replace(/\s*$/, "")}${have ? "\n\n" : ""}${block}\n`);
 } else note("kept   .env.example (already lists every name)");
 
 // 5. Dependencies.

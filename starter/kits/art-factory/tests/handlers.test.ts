@@ -144,6 +144,22 @@ describe("the doors", () => {
     const second = await asUser({ prompt: "A dog", kind: "item" });
     expect(second.status).toBe(429);
     expect((await asUser({ prompt: "A dog", kind: "nonsense" })).status).toBe(400);
+    // Ten clicks at once with a cap of 3: exactly three pictures are drawn, and the refused ones cost nothing.
+    const busy = build({}, { whoIs: (request) => request.headers.get("x-user") });
+    await busy.factory.settings.write({ dailyCap: 3 });
+    const results = await Promise.all(
+      Array.from({ length: 10 }, () => busy.handlers.makePost(new Request(`${site}/api/art/make`, { method: "POST", headers: { "content-type": "application/json", "x-user": "kai" }, body: JSON.stringify({ prompt: "A fox", kind: "item" }) }))),
+    );
+    expect(results.filter((one) => one.status === 200)).toHaveLength(3);
+    expect(busy.provider.requests).toHaveLength(3);
+    // A failed drawing hands its slot back.
+    const failing = build({}, { whoIs: () => "lee" });
+    await failing.factory.settings.write({ dailyCap: 1 });
+    failing.provider.next = [{ ok: false, code: "art-failed", detail: "boom" }];
+    const tryOnce = () => failing.handlers.makePost(new Request(`${site}/api/art/make`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt: "A fox", kind: "item" }) }));
+    expect((await tryOnce()).status).toBe(502);
+    expect((await tryOnce()).status).toBe(200);
+
     const status = await (await people.handlers.makeGet(new Request(`${site}/api/art/make`, { headers: { "x-user": "pat" } }))).json();
     expect(status).toMatchObject({ allowed: true, on: true, remaining: 0, cap: 1 });
     expect(Object.keys(status.kinds)).toContain("character");

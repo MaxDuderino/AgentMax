@@ -54,7 +54,8 @@ def style_from_bible():
         path = (base / bible) if not Path(bible).is_absolute() else Path(bible)
         if path.exists():
             text = path.read_text(encoding="utf-8")
-            match = re.search(r"##\s*Style block.*?\n((?:>.*\n?)+)", text, re.S | re.I)
+            # Line by line (no DOTALL): the heading, any non-quote lines under it, then only the quoted lines that follow.
+            match = re.search(r"^##[ \t]*Style block[^\n]*\n(?:(?!##)(?!>)[^\n]*\n)*?((?:>[^\n]*(?:\n|$))+)", text, re.M | re.I)
             if match:
                 quote = " ".join(line.lstrip("> ").strip() for line in match.group(1).splitlines()).strip()
                 return "" if quote.startswith("<") else quote
@@ -87,7 +88,7 @@ for asset in data.get("assets", []):
         problems.append(f'{asset.get("id")}: no prompt')
         continue
     if isinstance(asset.get("sizes"), str) and asset["sizes"] not in factory.get("sizes", {}):
-        problems.append(f'{asset.get("id")}: size preset "{asset["sizes"]}" is not in the factory block's sizes')
+        problems.append(f'{asset.get("id")}: size preset "{asset["sizes"]}" is not in the factory block sizes')
         continue
     family = asset.get("family") or "Other"
     file = str(asset.get("file") or f'{slug(asset.get("name"))}.webp').replace("\\", "/")

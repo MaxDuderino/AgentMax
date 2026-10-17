@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { AdminLogin, AdminShell } from "../lib/art-factory/ui/admin-shell";
-import { artSrc } from "../lib/art-factory/ui/api";
+import { artSrc, safeNext } from "../lib/art-factory/ui/api";
 import { ArtFactory } from "../lib/art-factory/ui/art-factory";
 import { MakeArtButton } from "../lib/art-factory/ui/make-art-button";
 import { PictureMakerPicker } from "../lib/art-factory/ui/picture-maker-picker";
@@ -37,6 +37,14 @@ describe("the screens render", () => {
     expect(renderToStaticMarkup(<AdminLogin appName="X" next="/admin/art-factory" mode="locked" />)).toContain("ADMIN_PASSWORD");
     expect(renderToStaticMarkup(<AdminLogin appName="X" next="/admin/art-factory" mode="password" />)).toContain('type="password"');
     expect(renderToStaticMarkup(<AdminLogin appName="X" next="/admin/art-factory" mode="open-laptop" />)).toContain("already the admin");
+  });
+
+  it("after sign-in, only ever goes to a page on this site", () => {
+    const home = "/admin/art-factory";
+    expect(safeNext("/admin/usage?x=1", home)).toBe("/admin/usage?x=1");
+    const backslash = String.fromCharCode(92);
+    const bads = ["//evil.example", `/${backslash}evil.example`, `/${backslash}${backslash}evil.example`, "https://evil.example", `/${String.fromCharCode(9)}evil`, `/${String.fromCharCode(10)}evil`, "", null, "javascript:alert(1)"];
+    for (const bad of bads) expect(safeNext(bad as string, home)).toBe(home);
   });
 
   it("artSrc points at the address approved art is always served from", () => {

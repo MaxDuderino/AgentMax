@@ -1,6 +1,6 @@
 import { makeArtAllowance, readMakeArtPrompt, type MakeArtKind } from "../core/make-art-prompt";
 import type { ArtStore } from "./art-store";
-import type { ImageProvider } from "./image-provider";
+import type { ImageProvider, ImageResult } from "./image-provider";
 import type { Kv } from "./kv";
 import type { ImageConverter } from "./webp";
 
@@ -12,9 +12,10 @@ import type { ImageConverter } from "./webp";
  * The order is the point:
  * 1. **Who.** The project's `whoIs` (its own accounts), or the admin. Nobody
  *    else, unless the project says so: pictures cost money.
- * 2. **The daily cap is checked before anything is drawn**, and counted only
- *    after the picture is stored, so a refusal or a failure costs nothing.
- *    Admins are never capped. The cap is set on the switcher.
+ * 2. **A slot under the daily cap is reserved before anything is drawn**, in
+ *    one atomic step, so many clicks at once cannot all slip under the cap.
+ *    A refusal or a failure gives the slot back, so it costs nothing. Admins
+ *    are never capped. The cap is set on the switcher.
  * 3. **Made small:** WebP, at most 1536px.
  * 4. **Labelled** with the words, the provider and who made it, and counted
  *    in AI usage as `make-art`.
@@ -77,13 +78,29 @@ export async function makeArt(deps: MakeArtDeps, input: { who: string | null; ad
   const now = deps.now?.() ?? new Date();
   const day = now.toISOString().slice(0, 10);
   const cap = await deps.cap();
-  const allowance = makeArtAllowance({ usedToday: await usedToday(deps, who), cap, unlimited: input.admin });
-  if (!allowance.allowed) return fail("art-cap-reached");
+  if (!makeArtAllowance({ usedToday: await usedToday(deps, who), cap, unlimited: input.admin }).allowed) return fail("art-cap-reached");
 
   const provider = await deps.provider(who);
   if (!provider) return fail("art-provider-off");
-  const drawn = await provider.generate({ prompt, aspect: kind.aspect, label: prompt.split(/[.\n]/)[0]!.slice(0, 60), ...(kind.seeThrough ? { background: "transparent" as const } : {}) });
-  if (!drawn.ok) return fail(drawn.code);
+
+  // Reserve the slot before drawing, in one atomic step (Redis INCR), so parallel clicks cannot all slip under the cap.
+  // Every way out below that does not end in a stored picture hands the slot back.
+  const slot = countKey(deps.prefix, who, day);
+  const counted = await deps.kv.incr(slot);
+  if (counted === 1) await deps.kv.expire(slot, 60 * 60 * 48);
+  const giveBack = async (code: MakeArtFailure): Promise<MakeArtResult> => {
+    await deps.kv.decr(slot);
+    return fail(code);
+  };
+  if (!input.admin && cap !== null && counted > cap) return giveBack("art-cap-reached");
+
+  let drawn: ImageResult;
+  try {
+    drawn = await provider.generate({ prompt, aspect: kind.aspect, label: prompt.split(/[.\n]/)[0]!.slice(0, 60), ...(kind.seeThrough ? { background: "transparent" as const } : {}) });
+  } catch {
+    return giveBack("art-failed");
+  }
+  if (!drawn.ok) return giveBack(drawn.code);
 
   let bytes = drawn.bytes;
   let type = drawn.contentType;
@@ -103,13 +120,11 @@ export async function makeArt(deps: MakeArtDeps, input: { who: string | null; ad
     url = (await deps.art.put(key, bytes, type)).url;
   } catch (error) {
     console.error("[art-factory] Make art could not store a picture", error);
-    return fail("store-failed");
+    return giveBack("store-failed");
   }
 
   const label: MakeArtLabel = { prompt, kind: String(input.kind), provider: provider.name, ...(provider.model ? { model: provider.model } : {}), by: who, at: now.toISOString(), provenance: "ai-generated" };
   await deps.kv.hset(`${deps.prefix}:make-art:labels`, { [key]: JSON.stringify(label) });
-  const counted = await deps.kv.incr(countKey(deps.prefix, who, day));
-  if (counted === 1) await deps.kv.expire(countKey(deps.prefix, who, day), 60 * 60 * 48);
   const remaining = input.admin || cap === null ? null : Math.max(0, cap - counted);
   return { ok: true, key, url, remaining };
 }

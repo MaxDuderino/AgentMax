@@ -20,6 +20,7 @@ export interface Kv {
   set(key: string, value: string, options?: { nx?: boolean; px?: number }): Promise<boolean>;
   del(key: string): Promise<void>;
   incr(key: string): Promise<number>;
+  decr(key: string): Promise<number>;
   expire(key: string, seconds: number): Promise<void>;
   hget(key: string, field: string): Promise<string | null>;
   hgetall(key: string): Promise<Record<string, string>>;
@@ -68,6 +69,11 @@ export class MemoryKv implements Kv {
     this.#values.set(key, { value: String(next), until: this.#values.get(key)?.until ?? null });
     return next;
   }
+  async decr(key: string) {
+    const next = Number(this.#live(key)?.value ?? 0) - 1;
+    this.#values.set(key, { value: String(next), until: this.#values.get(key)?.until ?? null });
+    return next;
+  }
   async expire(key: string, seconds: number) {
     const found = this.#live(key);
     if (found) found.until = this.#clock() + seconds * 1000;
@@ -113,6 +119,7 @@ interface UpstashLike {
   set(key: string, value: string, options?: Record<string, unknown>): Promise<unknown>;
   del(key: string): Promise<unknown>;
   incr(key: string): Promise<number>;
+  decr(key: string): Promise<number>;
   expire(key: string, seconds: number): Promise<unknown>;
   hget(key: string, field: string): Promise<unknown>;
   hgetall(key: string): Promise<Record<string, unknown> | null>;
@@ -150,6 +157,9 @@ export class RedisKv implements Kv {
   }
   async incr(key: string) {
     return (await this.#client).incr(key);
+  }
+  async decr(key: string) {
+    return (await this.#client).decr(key);
   }
   async expire(key: string, seconds: number) {
     await (await this.#client).expire(key, seconds);

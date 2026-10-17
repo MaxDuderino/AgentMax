@@ -38,6 +38,14 @@ Max's choices: where the code lives, **"In the template"**; the kit includes the
 - Fixed from that run: two number boxes with no label, Redo not restarting the queue, the usage page hiding Google, focus after Approve all, the sign-in form layout. Also changed listed pictures to stable ids, so reordering the art list never scrambles the factory's records.
 - Asset Forge's catalogue output passes the kit's own checker.
 
+**Fixed after the PR review (Copilot, 2026-10-16)**
+- Sign-in could send the admin to another site with a crafted `next=/\evil` link; now only paths on the same site are followed.
+- Make art's daily cap could be beaten by many clicks at once; a slot is now reserved in one atomic step before drawing and handed back on any failure (tested: 10 clicks at a cap of 3 draw exactly 3).
+- `build_catalogue.py` had a broken quote from my own last edit (it would not run at all) and its style-block reader swallowed the rest of STYLE.md; both fixed and re-run.
+- The factory and Make art routes now allow 300 s, longer than OpenAI's own 180 s limit, so a paid picture is not cut off.
+- The installer adds only the missing variable names to `.env.example`, never duplicates.
+- `build.py` leaves files removed from a kit out of the skill zip in the same build.
+
 **Not done / not tested**
 - **No real picture maker, Redis or R2 was used.** OpenAI and Google were tested with recorded answers, R2 with a stand-in bucket, Redis with a stand-in client. The first real run in a project is the real test.
 - Not yet installed in one of Max's own projects, so the skill itself hasn't run end to end there.
