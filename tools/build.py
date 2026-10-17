@@ -12,6 +12,7 @@ Sources (edit these, never the generated files):
   focus-group/testers.json             the Focus Group crew
   qa-team/roles/*.md                   QA Team roles (except henry.md, which is generated)
   <skill>/SKILL.md                     every skill folder
+  starter/kits/<kit>/                  code kits shipped in the template (e.g. the Art Factory)
 
 Generated:
   bvd/personas/NN-<slug>.md            portable persona files
@@ -22,6 +23,7 @@ Generated:
   dist/<skill>.zip                     one zip per skill for Claude chat (same bytes every build)
   dist/for-gpt-gemini/                 the paste-in kit for GPT, Gemini, AI Studio and other tools
   starter/CLAUDE.md, AGENTS.md, VISION.md   the template's generated files (the rest of starter/ is source)
+  art-factory/kit/                     a copy of starter/kits/art-factory, so the installed skill carries the code
 """
 import io
 import json
@@ -268,7 +270,7 @@ for d in skills:
 
 # ------------------------------------------------ Paste-in kit for other AIs
 ORDER = ["session-kickoff", "wrap", "bvd", "vision-keeper", "checkpoint", "key-keeper", "translator", "scribe",
-         "qa-team", "focus-group", "deploy-doctor", "asset-forge", "handoff-packer"]
+         "qa-team", "focus-group", "deploy-doctor", "asset-forge", "art-factory", "handoff-packer"]
 names = [d.name for d in skills]
 ordered = [n for n in ORDER if n in names] + [n for n in names if n not in ORDER]
 
@@ -303,12 +305,31 @@ emit("starter/CLAUDE.md",
 emit("starter/AGENTS.md", read("snippets/AGENTS.md"))
 emit("starter/VISION.md", read("vision-keeper/templates/VISION.md"))
 
+# ----------------------------------------- Code kits travel with their skill
+# The kit's source is starter/kits/<kit>/ (so MaxTemplateWithAgents ships it); the skill of the same
+# name gets a copy in <skill>/kit/ so an installed skill can install the kit into any project.
+KIT_SKIP_DIRS = {"node_modules", ".next", "__pycache__"}
+KIT_SKIP_FILES = {"package-lock.json", "tsconfig.tsbuildinfo", "next-env.d.ts"}
+kit_copies = {}                     # generated folder -> set of files it should hold
+for kit in sorted(p for p in (ROOT / "starter/kits").iterdir() if p.is_dir()) if (ROOT / "starter/kits").exists() else []:
+    if not (ROOT / kit.name / "SKILL.md").exists():
+        continue
+    dest = f"{kit.name}/kit"
+    kit_copies[dest] = set()
+    for f in sorted(kit.rglob("*")):
+        parts = f.relative_to(kit).parts
+        if not f.is_file() or any(part in KIT_SKIP_DIRS for part in parts) or f.name in KIT_SKIP_FILES:
+            continue
+        rel = f"{dest}/{'/'.join(parts)}"
+        kit_copies[dest].add(rel)
+        emit(rel, f.read_bytes())
+
 # ------------------------------------------------- Skill zips (deterministic)
 def zip_bytes(folder, overrides):
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         files = {f.relative_to(ROOT).as_posix(): f for f in folder.rglob("*")
-                 if f.is_file() and f.suffix != ".docx" and "__pycache__" not in f.parts}
+                 if f.is_file() and f.suffix != ".docx" and "__pycache__" not in f.parts and "node_modules" not in f.parts}
         for rel in overrides:
             if rel.startswith(folder.name + "/"):
                 files[rel] = None
@@ -329,11 +350,16 @@ for d in skills:
 # ------------------------------------------------------------ write / check
 stale = [rel for rel, data in sorted(OUT.items())
          if not (ROOT / rel).exists() or (ROOT / rel).read_bytes() != data]
+# A file removed from a kit is removed from its copy too.
+leftover = sorted(f.relative_to(ROOT).as_posix() for dest, keep in kit_copies.items() if (ROOT / dest).exists()
+                  for f in (ROOT / dest).rglob("*") if f.is_file() and f.relative_to(ROOT).as_posix() not in keep)
 if CHECK:
-    if stale:
-        print(f"{len(stale)} generated file(s) out of date. Run: python tools/build.py")
+    if stale or leftover:
+        print(f"{len(stale) + len(leftover)} generated file(s) out of date. Run: python tools/build.py")
         for rel in stale:
             print("  " + rel)
+        for rel in leftover:
+            print("  " + rel + " (no longer in the kit)")
         sys.exit(1)
     print(f"All {len(OUT)} generated files are up to date.")
     sys.exit(0)
@@ -342,5 +368,8 @@ for rel in stale:
     p = ROOT / rel
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_bytes(OUT[rel])
+for rel in leftover:
+    (ROOT / rel).unlink()
 print(f"Built {len(canon['members'])} BVD seats, {len(testers)} testers, {len(qa_roles)} QA roles, "
-      f"{len(skills)} skills. {len(stale)} file(s) changed, {len(OUT) - len(stale)} already up to date.")
+      f"{len(skills)} skills, {len(kit_copies)} kit(s). {len(stale)} file(s) changed, {len(leftover)} removed, "
+      f"{len(OUT) - len(stale)} already up to date.")

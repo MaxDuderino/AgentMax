@@ -1,0 +1,131 @@
+"""Builds art-catalogue.json, the Art Factory's list of what to make, from prompts.json.
+
+Usage:  python build_catalogue.py assets/prompts.json art/art-catalogue.json [--all]
+
+prompts.json stays the one source of truth. This writes the catalogue the
+in-app Art Factory reads (the art-factory kit), the same way build_queue.py
+writes the ChatGPT queue. Never edit the catalogue by hand: change
+prompts.json and run this again.
+
+  - Each family becomes a group; each folder within a family becomes a job.
+  - Each asset keeps its id, so the factory remembers it even if the list
+    is reordered.
+  - Assets marked done or skip are left out (they were made by hand, or are
+    not wanted). --all keeps them.
+  - The optional "factory" block in prompts.json sets size presets and a
+    style block per family. Without one, the style block comes from STYLE.md
+    ("## Style block") and sizes from each asset's shape.
+"""
+import json
+import re
+import sys
+from pathlib import Path
+
+args = [a for a in sys.argv[1:] if not a.startswith("--")]
+if len(args) != 2 or "-h" in sys.argv or "--help" in sys.argv:
+    print(__doc__)
+    sys.exit(0 if ("-h" in sys.argv or "--help" in sys.argv) else 2)
+KEEP_ALL = "--all" in sys.argv
+src, out = Path(args[0]), Path(args[1])
+data = json.loads(src.read_text(encoding="utf-8"))
+factory = data.get("factory", {})
+
+# Sizes by shape, used when an asset names no preset. Transparent-ground assets keep their whole silhouette ("contain").
+SHAPE_SIZES = {
+    "square": {"width": 1024, "height": 1024},
+    "portrait": {"width": 768, "height": 1024},
+    "landscape": {"width": 1536, "height": 1024},
+    "wide": {"width": 1920, "height": 1080},
+    "tall": {"width": 1080, "height": 1920},
+}
+
+
+def slug(text, fallback="item"):
+    s = re.sub(r"[^a-z0-9]+", "-", str(text).lower()).strip("-")
+    return s or fallback
+
+
+def style_from_bible():
+    """The first quoted paragraph under '## Style block' in STYLE.md, if there is one."""
+    bible = data.get("style")
+    if not bible:
+        return ""
+    for base in (src.parent, src.parent.parent, Path.cwd()):
+        path = (base / bible) if not Path(bible).is_absolute() else Path(bible)
+        if path.exists():
+            text = path.read_text(encoding="utf-8")
+            match = re.search(r"##\s*Style block.*?\n((?:>.*\n?)+)", text, re.S | re.I)
+            if match:
+                quote = " ".join(line.lstrip("> ").strip() for line in match.group(1).splitlines()).strip()
+                return "" if quote.startswith("<") else quote
+            return ""
+    return ""
+
+
+def sizes_for(asset):
+    wanted = asset.get("sizes")
+    if wanted:
+        return wanted  # a preset name, or an inline list
+    shape = SHAPE_SIZES.get(asset.get("shape", "square"), SHAPE_SIZES["square"])
+    clear = bool(re.search(r"transparen", asset.get("prompt", ""), re.I)) and not re.search(r"\bno\s+transparen", asset.get("prompt", ""), re.I)
+    return [{"suffix": "", **shape, "fit": "contain" if clear else "cover"}]
+
+
+default_style = style_from_bible()
+styles = factory.get("styles", {})
+groups = {}
+problems = []
+seen_ids = set()
+skipped = 0
+
+for asset in data.get("assets", []):
+    status = asset.get("status", "todo")
+    if status in ("done", "skip") and not KEEP_ALL:
+        skipped += 1
+        continue
+    if not asset.get("prompt", "").strip():
+        problems.append(f'{asset.get("id")}: no prompt')
+        continue
+    if isinstance(asset.get("sizes"), str) and asset["sizes"] not in factory.get("sizes", {}):
+        problems.append(f'{asset.get("id")}: size preset "{asset["sizes"]}" is not in the factory block's sizes')
+        continue
+    family = asset.get("family") or "Other"
+    file = str(asset.get("file") or f'{slug(asset.get("name"))}.webp').replace("\\", "/")
+    file = re.sub(r"^\.?/?public/", "", file)
+    folder, _, name = file.rpartition("/")
+    stem = re.sub(r"\.[a-z0-9]+$", "", name, flags=re.I)
+    image_id = re.sub(r"[^A-Za-z0-9_-]+", "-", str(asset.get("id") or stem)).strip("-")
+    if image_id in seen_ids:
+        problems.append(f"two assets have the id {image_id}")
+    seen_ids.add(image_id)
+
+    group_id = slug(asset.get("group") or family, "other")
+    group = groups.setdefault(group_id, {"id": group_id, "title": family, "jobs": {}})
+    style = styles.get(family) or styles.get(group_id) or default_style
+    if style:
+        group["style"] = style
+    job_id = slug(folder or "art", "art")
+    job = group["jobs"].setdefault(job_id, {"id": job_id, "title": f"{family}: {folder or 'art'}", "dir": folder or "art", "images": []})
+    image = {"id": image_id, "name": asset.get("name") or stem, "file": stem, "prompt": asset["prompt"].strip(), "sizes": sizes_for(asset)}
+    groups[group_id] = group
+    job["images"].append(image)
+
+if problems:
+    print("Not written. Fix these in prompts.json first:")
+    for p in problems:
+        print("  - " + p)
+    sys.exit(1)
+
+catalogue = {
+    "version": 1,
+    "project": data.get("project", ""),
+    "note": f"Generated by Asset Forge's build_catalogue.py from {src.as_posix()}. Do not edit by hand: change prompts.json and rebuild.",
+    "sizes": factory.get("sizes", {}),
+    "groups": [{**{k: v for k, v in g.items() if k != "jobs"}, "jobs": list(g["jobs"].values())} for g in groups.values()],
+}
+if factory.get("root"):
+    catalogue["root"] = factory["root"]
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text(json.dumps(catalogue, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+made = sum(len(j["images"]) for g in catalogue["groups"] for j in g["jobs"])
+print(f"Wrote {out}: {made} pictures in {len(catalogue['groups'])} groups ({skipped} done or skipped left out).")

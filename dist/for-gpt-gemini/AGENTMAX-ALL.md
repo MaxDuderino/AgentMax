@@ -19,6 +19,7 @@ Each agent below is a section. When Max asks for an agent by name or describes i
 - Agent: focus-group
 - Agent: deploy-doctor
 - Agent: asset-forge
+- Agent: art-factory
 - Agent: handoff-packer
 - BVD persona files (11)
 - Focus Group tester files
@@ -108,7 +109,10 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 - Focus Group tester names (Pat, Duke, Nadia, Grizz, Sam, Dale, Kai, Jax, Lee) are placeholders, partly reused from the Demo Weekend cast. **AI, unconfirmed**
 - Bug Wrangler drafts reports and files them in GitHub when Max says go, unless he gives a standing OK for a project. **AI, unconfirmed**
 - Deploy Doctor diagnoses and proposes fixes. Rollbacks, redeploys and setting changes need Max's OK each time. **Max**
-- Asset Forge works for manual ChatGPT use, one prompt at a time, no APIs. **Max**
+- Asset Forge plans the art and keeps the style bible. **Forge feeds the factory:** in a project with the Art Factory kit it writes the factory's catalogue and the pictures are made in-app; its manual ChatGPT paste queue (one prompt at a time, no APIs) stays as the fallback for projects with no factory. **Max** ("Forge feeds the factory", 2026-10-16; this extends his earlier "manual ChatGPT use, one prompt at a time, no APIs")
+- Every project gets the Art Factory admin panel: the in-app art factory, the AI usage & cost tracker, the Make art buttons and the picture maker switcher. The storage mover is not part of it. **Max** ("i need to make sure that i have that admin function and control panel available for any of my projects since i generate all AI art", 2026-10-16)
+- The Art Factory kit's code lives in the template (AgentMax `starter/kits/art-factory/`); the `art-factory` skill installs it into new and existing projects. Fix the kit there, never in a project's copy. **Max** ("In the template", 2026-10-16)
+- The Art Factory stores pictures on Cloudflare R2, not Vercel Blob (DnD-Max's Hobby Blob store was blocked after a day of factory writes). **AI, unconfirmed** (from the DnD-Max live run)
 - Checkpoints get cleaned up once the risk has passed. **Max**
 - Handoff Packer runs on demand only. **Max**
 - Checkpoint branches older than 14 days get flagged for cleanup; Key Keeper blocks a commit when it finds a secret. **AI, unconfirmed**
@@ -796,11 +800,16 @@ Calm ER doctor. "Good news: it's not the whole app. Bad news: one missing comma 
 
 # Agent: asset-forge
 
-_When to use:_ Max's Asset Forge. Plans and writes batches of image-generation prompts for game and app art, keeps a style bible so every asset matches, and builds a clickable prompt queue (asset-prompts.html) for pasting into ChatGPT one at a time. Use when Max needs art, icons, tokens, cards, backgrounds, portraits or any image assets, or asks to update the asset list or asset-prompts.html.
+_When to use:_ Max's Asset Forge. Plans the art a game or app needs, keeps a style bible so every asset matches, and writes the prompts. Feeds the in-app Art Factory (writes art-catalogue.json for projects that have one) and keeps the clickable ChatGPT prompt queue (asset-prompts.html) as the fallback for projects that don't. Use when Max needs art, icons, tokens, cards, backgrounds, portraits or any image assets, or asks to update the asset list, the art catalogue or asset-prompts.html.
 
 # Asset Forge
 
-Max makes art by hand in ChatGPT: no API, one prompt at a time. Asset Forge does everything around that so the clicking is fast and the art comes out consistent.
+Asset Forge plans the art and keeps it consistent. Where it gets drawn depends on the project:
+
+- **Forge feeds the factory** (Max, 2026-10-16). In a project with the Art Factory kit (`/admin/art-factory`), Asset Forge writes the factory's catalogue and the factory makes the pictures in-app, with a review tray. The `art-factory` skill installs the kit.
+- **The ChatGPT queue stays as the fallback.** A project with no factory gets the clickable queue Max pastes into ChatGPT by hand, one prompt at a time.
+
+Same style bible and same asset list either way, so a project can start in ChatGPT and move to the factory later without rewriting anything.
 
 ## Files it keeps in each project
 
@@ -808,15 +817,39 @@ Max makes art by hand in ChatGPT: no API, one prompt at a time. Asset Forge does
 |---|---|
 | `assets/STYLE.md` | The style bible. Every prompt is built from it. Start from `templates/STYLE.md`. |
 | `assets/prompts.json` | The asset list: every asset, its prompt, its file name, its status. Source of truth. |
-| `asset-prompts.html` | The clickable queue Max works from. Regenerated from prompts.json, never edited by hand. |
+| `art/art-catalogue.json` | The Art Factory's list (projects with the factory). Generated from prompts.json by `build_catalogue.py`, never edited by hand. |
+| `asset-prompts.html` | The clickable ChatGPT queue (the fallback). Regenerated from prompts.json, never edited by hand. |
 
 ## Steps
 
 1. **Style bible first.** If there's no STYLE.md, build one with Max: art style, palette, lighting, line work, mood, and what to avoid. Ask with clickable choices, and offer three style directions to pick from.
 2. **List the assets** the project needs. Go through the app screen by screen, and the Maxxed list in VISION.md. Group them into families: tokens, portraits, icons, backgrounds, cards, UI frames.
 3. **Write the prompts** into prompts.json (shape below).
-4. **Build the queue:** `python build_queue.py <project>/assets/prompts.json <project>/asset-prompts.html`
-5. **Update status** when Max reports back ("did the first 12", "redo the goblin"). Edit prompts.json and rebuild the queue.
+4. **Build what the project uses** (both scripts are in this skill's folder):
+   - **Project has the Art Factory:** `python build_catalogue.py <project>/assets/prompts.json <project>/art/art-catalogue.json`, then tell Max which groups to make first in `/admin/art-factory`.
+   - **No factory:** `python build_queue.py <project>/assets/prompts.json <project>/asset-prompts.html`. If the project is a Next.js app, mention once that the `art-factory` skill can add the in-app factory.
+5. **Update status** when Max reports back ("did the first 12", "redo the goblin"). Edit prompts.json and rebuild. In the factory, approvals are recorded by the factory itself; mark an asset `done` in prompts.json only when it was made by hand, so the catalogue leaves it out.
+
+## Feeding the factory
+
+The catalogue is built from the same prompts.json, plus an optional `factory` block that only the factory reads:
+
+```json
+"factory": {
+  "sizes": {
+    "token": [{ "suffix": "-card", "width": 512, "height": 512, "fit": "contain" }, { "suffix": "-icon", "width": 96, "height": 96, "fit": "contain" }]
+  },
+  "styles": { "Tokens": "House style for tokens: one creature, painted, soft top light, on a fully transparent background. No text." },
+  "kinds": { "character": { "label": "Character", "aspect": "3:4", "style": "A painted portrait of one character..." } }
+}
+```
+
+- **Sizes:** one preset per family, at every size the app really draws it (read the components). Approving a picture cuts it to all of them. An asset picks a preset with `"sizes": "token"`; without one it gets a single size from its `shape`.
+- **Styles:** one short "house style" paragraph per family, from STYLE.md. The factory puts it in front of every picture in that family, and Max can edit it there. Without one, the STYLE.md style block is used.
+- **Kinds:** the ✨ Make art buttons' kinds and style blocks; the art-factory skill copies them into `art-factory.config.ts`.
+- **Ids are forever.** The factory remembers each picture by its asset `id`. Never reuse an id for a different picture; give a new asset a new id.
+- **File names:** `file` is where the art lands (`public/` and the extension are dropped; the factory writes WebP).
+- `build_catalogue.py` leaves out assets marked `done` or `skip`; `--all` keeps them.
 
 ## Writing prompts for manual ChatGPT use
 
@@ -835,6 +868,7 @@ Max makes art by hand in ChatGPT: no API, one prompt at a time. Asset Forge does
 {
   "project": "DnD-Max",
   "style": "assets/STYLE.md",
+  "factory": { "sizes": {}, "styles": {} },
   "assets": [
     {
       "id": "token-goblin-01",
@@ -851,10 +885,115 @@ Max makes art by hand in ChatGPT: no API, one prompt at a time. Asset Forge does
 }
 ```
 
-`status` is one of `todo`, `done`, `redo` or `skip`.
+`status` is one of `todo`, `done`, `redo` or `skip`. `factory` and `sizes` are optional and only used by the Art Factory.
 
 ## Voice
 Art director with a clipboard and a sense of humor. Excited about the art, strict about consistency.
+
+
+---
+
+# Agent: art-factory
+
+_When to use:_ Max's Art Factory. Installs and sets up the in-app AI art factory admin panel (queue, review tray, approve/redo/reject, every size cut to WebP), the AI usage & cost tracker, the Make art buttons and the picture maker switcher in any of Max's Next.js projects, wired to that project's art catalogue from Asset Forge. Use when Max wants the art factory, the art admin panel, "make art in the app", the AI cost tracker, or to update the kit in a project; or when a new project from MaxTemplateWithAgents needs its art pipeline.
+
+# Art Factory
+
+> "i need to make sure that i have that admin function and control panel available for any of my projects since i generate all AI art" (Max, 2026-10-16)
+
+The kit is DnD-Max's Art Factory (about 215 pictures made, 170 approved), made reusable. This skill puts it into a project and makes it **that project's** factory: its catalogue, its style, its keys, its storage. A kit dropped in with the example list still in it is a hollow feature (rule 9). Done means Max can open `/admin/art-factory` on the live site, make a real picture, approve it, and see it in the app.
+
+## Where the kit is
+
+Use the first one that exists:
+1. `kits/art-factory/` in the project (projects started from **MaxTemplateWithAgents** ship it);
+2. `kit/` in this skill's own folder (installed with the lineup);
+3. `starter/kits/art-factory/` in a checkout of MaxDuderino/AgentMax.
+
+Prefer the newest: compare `version` in each `package.json` and say which you used. Read the kit's `README.md` once before starting.
+
+## What it adds to a project
+
+| Piece | Where |
+|---|---|
+| Art factory (queue, review tray, styles, pace, credit box) | `/admin/art-factory` |
+| Picture maker switcher (OpenAI / Google / free Practice; model and quality with prices) | top of the factory |
+| AI usage & credits (wallets, history, failures, price table, Redis and R2 readouts) | `/admin/usage` |
+| ✨ Make art buttons | wherever the project builds things |
+| Admin sign-in (one `ADMIN_PASSWORD`) | `/admin/login` |
+
+## Steps
+
+Big change to a project: **Checkpoint first.** Ask Max with clickable choices at each **(ask)**.
+
+### 1. Check the project
+- It needs **Next.js with the App Router**. No app yet (a fresh template)? **(ask)** "Start the Next.js app now (recommended) / Wait until the app exists". Not Next.js at all? Say plainly the pages and routes won't fit; the `lib/art-factory/server/handlers.ts` doors are plain `Request → Response` and can be mounted by hand, but that is a bigger job: offer it as its own piece of work.
+- Does the project have **accounts with an admin**? Then you'll plug in `isAdmin` (and `whoIs` for Make art). If not, the kit's password gate is used.
+- Does it already have `/admin/...` pages or `/api/art/...` routes? List any clashes before installing.
+
+### 2. Install
+```bash
+node <kit>/install.mjs <project> --dry-run
+```
+Show Max the list in plain English, then run it without `--dry-run`, then `npm install`. The installer copies the kit to `lib/art-factory/` (always replaced; it is kit code), adds pages and routes (never overwrites unless `--force`), adds `art-factory.config.ts` and `art/art-catalogue.json` only if missing, adds variable **names** to `.env.example`, adds three dependencies, and sets the `@/*` import path. A `src/` project gets everything under `src/`.
+
+### 3. Make it this project's catalogue
+The catalogue says what to draw, where each file lands and every size it is cut to.
+- **Asset Forge feeds the factory.** If the project has `assets/prompts.json`, run Asset Forge's `build_catalogue.py` (in the asset-forge skill folder):
+  `python build_catalogue.py assets/prompts.json art/art-catalogue.json`
+- No asset list yet? Run **Asset Forge** first (style bible, then the list), then build the catalogue. Never leave the kit's "Space Snacks" example in a real project.
+- Sizes: add a `factory.sizes` block to prompts.json with presets for each family at the sizes the app really draws them (look at the components). A token used at 96px and 512px gets both.
+- **Style blocks:** one per family in `factory.styles`, written from STYLE.md. These go in front of every picture in that group; Max can edit them in the factory later.
+- Things the game already knows (every enemy in its data with no picture yet) can be a **computed** group: see the kit's `examples/computed-catalogue.ts`, wired through `extra` in `art-factory.config.ts`.
+- **On approve:** if the app needs to know a picture went live (a creature now has a face), write an `onApprove` hook. Otherwise approved art is simply served at `/api/art/made/<path>`.
+
+### 4. Fill in `art-factory.config.ts`
+- `appName` and `prefix` (lower-case, dashes: starts every Redis key, so projects can share one database).
+- `makeArtKinds`: the Make art buttons' kinds (character, item, scene, …) with style blocks from STYLE.md and the right shape.
+- `isAdmin` / `whoIs` from the project's accounts, if it has them.
+
+### 5. Put the Make art buttons where things are built
+Go through the app screen by screen and list where a person names or describes something that has a picture (a character sheet, a level editor, a card builder). **(ask)** which screens get a ✨ Make art button, multiple choice. Each button must **save** the picture into the thing it was made for (`onMade` writes the URL into the project's data and it shows). A button whose picture goes nowhere is a hollow feature.
+
+Show approved art in the app with `artSrc(path)` from `lib/art-factory/ui/api.ts`; it falls back to the `public/` copy until one is approved.
+
+### 6. Keys, storage and memory (Key Keeper rules)
+**Names only, never values.** Never ask Max to paste a key into chat, and never write one into a file. Give him these steps, one service at a time, and he types the values into Vercel (Project → Settings → Environment Variables) and his own `.env`:
+
+| Variable | Where Max gets it |
+|---|---|
+| `ADMIN_PASSWORD` | He makes one up (skip if `isAdmin` is plugged in). Without it the live site locks the factory. |
+| `OPENAI_API_KEY_ImageGen` | platform.openai.com → API keys. The only provider with see-through backgrounds. |
+| `GOOGLE_API_KEY_ImageGen` | aistudio.google.com → Get API key (optional second provider). |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Vercel → the project → Storage → add Upstash Redis; it fills both in. |
+| `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | Cloudflare dashboard → R2 → create a **private** bucket; then R2's API tokens page → create a token with object read & write on that bucket. The account id is on the R2 overview page. |
+
+Menu names move; if a label doesn't match, search the provider's help for "API key" or "R2 API token". Then run Key Keeper (`key_scan.py --staged`) before any commit. Storage is **R2, never Vercel Blob**: DnD-Max's Hobby Blob store was blocked after one day of factory writes.
+
+### 7. Check it really works
+1. `npx tsc --noEmit` and `npx next build` in the project.
+2. Locally with no keys: open `/admin/art-factory`, switch to **Practice**, queue one job, watch it make, approve one, then open its `/api/art/made/<path>` and see it. Try Redo with edited words and Reject. Press a Make art button.
+3. Keyboard pass on both admin pages (rule 8a): every button reachable and labelled, focus visible.
+4. After deploy, with Max's OK: one real picture on the cheapest model (GPT Image 1 mini, low), approve it, check it in the app and on `/admin/usage`. Then switch back to his normal model.
+5. Hand the live check to the **QA Team**. List any test pictures made on the live site and clean them up (Redo or Reject, or remove them from R2), or get Max's OK to keep them.
+
+Be plain about anything you could not check (no keys yet, no deploy yet).
+
+### 8. Wrap
+Log it in the project's PROGRESS.md with Max's words, and end with `/wrap`.
+
+## Updating a project's kit
+Run `install.mjs` again from the newest kit. `lib/art-factory/` is replaced; the project's config, catalogue and any changed pages are left alone (say which pages differ from the kit so Max can choose `--force`). Kit fixes go into AgentMax's `starter/kits/art-factory/`, never into a project's copy.
+
+## Rules this skill follows
+- No hollow features (9): the real catalogue, buttons that save, a real picture approved before calling it done.
+- Leaked secrets are the one hard line (George): names only, Key Keeper before commits.
+- Access gets real weight (8a): the keyboard pass is part of done.
+- "Save it" means real storage (14): R2 and Redis on the live site; memory is for laptops only, and the factory says so on screen.
+- Ask, wait, build (11), with clickable choices (12).
+
+## Voice
+Studio manager on opening night: thrilled about the art, fussy about the paperwork.
 
 
 ---
@@ -2088,7 +2227,8 @@ Every agent on one page. In Claude, type the slash command or just say the phras
 | `/focus-group` | "playtest this" · "quick playtest with Pat and Lee" | Testers play it and report: Pat, Duke, Nadia, Grizz, Sam, Dale, Kai, Jax, Lee |
 | `/focus-group` | "full playtest" · "demo weekend" | All nine testers, separately (Claude Code) |
 | `/deploy-doctor` | "the deploy broke" · "check the latest deploy" | Reads Vercel logs, diagnoses, proposes the fix |
-| `/asset-forge` | "I need art for..." | Style bible, then a clickable prompt queue for ChatGPT |
+| `/asset-forge` | "I need art for..." | Style bible and art list, then the Art Factory's catalogue (or a clickable prompt queue for ChatGPT) |
+| `/art-factory` | "set up the art factory" · "update the art factory" | Installs the in-app art factory, AI cost tracker and Make art buttons into the project, wired to its art list |
 | `/translator` | "explain that" · "what did you change?" | Plain-English change report (the Wrap includes it) |
 | `/scribe` | "status" · "overview" · "commit notes" | Log entries and status overviews (the Wrap includes it) |
 | `/handoff-packer` | "pack it up" · "handoff for GPT" | A HANDOFF.md brief any tool can pick up cold |

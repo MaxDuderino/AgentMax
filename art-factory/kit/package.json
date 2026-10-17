@@ -1,0 +1,26 @@
+{
+  "name": "art-factory-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Max's Art Factory kit: in-app AI art factory, AI usage & cost tracker, Make art buttons, picture maker switcher. Ported from DnD-Max.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@upstash/redis": "1.38.2",
+    "aws4fetch": "1.0.20",
+    "sharp": "0.35.3"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.43",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "next": "16.3.2",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

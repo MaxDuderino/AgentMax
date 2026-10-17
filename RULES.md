@@ -76,7 +76,10 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 - Focus Group tester names (Pat, Duke, Nadia, Grizz, Sam, Dale, Kai, Jax, Lee) are placeholders, partly reused from the Demo Weekend cast. **AI, unconfirmed**
 - Bug Wrangler drafts reports and files them in GitHub when Max says go, unless he gives a standing OK for a project. **AI, unconfirmed**
 - Deploy Doctor diagnoses and proposes fixes. Rollbacks, redeploys and setting changes need Max's OK each time. **Max**
-- Asset Forge works for manual ChatGPT use, one prompt at a time, no APIs. **Max**
+- Asset Forge plans the art and keeps the style bible. **Forge feeds the factory:** in a project with the Art Factory kit it writes the factory's catalogue and the pictures are made in-app; its manual ChatGPT paste queue (one prompt at a time, no APIs) stays as the fallback for projects with no factory. **Max** ("Forge feeds the factory", 2026-10-16; this extends his earlier "manual ChatGPT use, one prompt at a time, no APIs")
+- Every project gets the Art Factory admin panel: the in-app art factory, the AI usage & cost tracker, the Make art buttons and the picture maker switcher. The storage mover is not part of it. **Max** ("i need to make sure that i have that admin function and control panel available for any of my projects since i generate all AI art", 2026-10-16)
+- The Art Factory kit's code lives in the template (AgentMax `starter/kits/art-factory/`); the `art-factory` skill installs it into new and existing projects. Fix the kit there, never in a project's copy. **Max** ("In the template", 2026-10-16)
+- The Art Factory stores pictures on Cloudflare R2, not Vercel Blob (DnD-Max's Hobby Blob store was blocked after a day of factory writes). **AI, unconfirmed** (from the DnD-Max live run)
 - Checkpoints get cleaned up once the risk has passed. **Max**
 - Handoff Packer runs on demand only. **Max**
 - Checkpoint branches older than 14 days get flagged for cleanup; Key Keeper blocks a commit when it finds a secret. **AI, unconfirmed**

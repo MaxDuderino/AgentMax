@@ -1,7 +1,9 @@
-# Status · 2026-10-15 · v1.0
-**Where we are:** **AgentMax v1.0.** 13 agents, all ✅ proven: 11 on real jobs in this session, plus Asset Forge and Deploy Doctor on Max's shakedown sign-off. It works in Claude chat, Claude Code (Windows), ChatGPT, Gemini and Visual Studio (Max's shakedown). New builds start from the MaxTemplateWithAgents template.
-**Next up:** use it. Add agents only when a real project needs one, and they go past the BVD first.
+# Status · 2026-10-16 · v1.1 (not pushed)
+**Where we are:** **AgentMax v1.0 + the Art Factory.** 14 agents: 13 ✅ proven, plus the new **Art Factory** (🧪 tested in a fresh Next.js app, not yet in one of Max's projects). The template now ships its first code kit, `starter/kits/art-factory/`. New builds start from the MaxTemplateWithAgents template.
+**Next up:** install the Art Factory into Max's next real project and make real art with it; refresh MaxTemplateWithAgents from `starter/`.
 **Waiting on Max:**
+- OK to push the Art Factory commit.
+- Copy `starter/` into MaxTemplateWithAgents so new projects get the kit.
 - Mark MaxTemplateWithAgents as a template on GitHub (Settings → tick "Template repository").
 - Delete the QA sample branch `docs/agentmax-qa-2026-10-15` in DnD-Max (GitHub → Branches → trash icon) and test table QXT-RZN on the live site.
 - Check push protection on DnD-Max.
@@ -9,6 +11,41 @@
 # Progress Log
 
 Newest on top. Each entry quotes the request that caused it.
+
+---
+
+## 2026-10-16 · The Art Factory: DnD-Max's art admin panel, for every project
+
+> "i need to make sure that i have that admin function and control panel available for any of my projects since i generate all AI art"
+
+Max's choices: where the code lives, **"In the template"**; the kit includes the factory plus **"AI usage & cost tracker", "Make art buttons", "Model/quality switcher"** (not the storage mover); and **"Forge feeds the factory"**. All work done in AgentMax; nothing in the DnD-Max repo was changed (read as the reference only).
+
+**What changed**
+- **New code kit: `starter/kits/art-factory/`.** DnD-Max's Art Factory, made reusable. The DnD-only parts (the art-todo list, packs, creatures, made-creature sync) became a **catalogue**: what to draw, where each file lands, every size it is cut to, style groups, and an on-approve hook. It keeps the live-run lessons: R2 storage (never Vercel Blob), uploads that send their length, stop rather than pay for pictures that can't be kept, busy ≠ failed, leases, see-through backgrounds, queueing starts making.
+  - Screens: Art factory (queue, review tray with Approve / Approve all / Redo / Edit words / Reject, styles, pace, credit box), picture maker switcher (OpenAI / Google with model, quality and prices), AI usage & credits, ✨ Make art button, admin sign-in.
+  - **New, beyond DnD-Max:** **Practice** mode (free placeholder pictures, to rehearse the whole flow with no key), a one-password admin gate for projects without accounts, Empty the queue, a progress bar, Redo also starts making, and one self-contained stylesheet with dark mode.
+  - `install.mjs` installs or updates the kit in any Next.js project (names-only `.env.example`, deps, `@/*` path; never overwrites the project's own config or catalogue).
+  - 70 tests of its own (`npm test`), and it typechecks against Next 16.
+- **New skill: `art-factory`.** Installs the kit into a new or existing project, makes it that project's factory (catalogue from Asset Forge, style blocks, Make art buttons that really save), walks Max through keys (names only, Key Keeper rules), Redis and R2, and checks it works before calling it done.
+- **Asset Forge feeds the factory.** New `build_catalogue.py` turns `prompts.json` into the factory's `art-catalogue.json` (stable ids, size presets, a style block per family). The ChatGPT paste queue stays as the fallback for projects with no factory.
+- **Pipeline:** `tools/build.py` copies each kit into its skill (`art-factory/kit/`), removes files a kit dropped, and leaves `node_modules` out of the zips.
+- **Rule Ledger:** Asset Forge's scope note now says "Forge feeds the factory" with Max's answer as the source (it extends his earlier "manual ChatGPT use, one prompt at a time, no APIs"). New entries for the art admin panel in every project, the kit living in the template, and R2 storage (that last one is **AI, unconfirmed**: it comes from the DnD-Max live run, not from Max).
+- LINEUP, README, COMMANDS, VISION, INSTALL (14 skills), the template README and the AGENTS snippet updated.
+
+**Tested**
+- The kit's 70 tests pass; `tsc` passes, including the Next.js pages and routes.
+- **A fresh Next.js 16 app**, made from scratch in a scratch folder: `install.mjs` installed the kit, `next build` passed with all 11 pages and routes, and in the browser (production mode, a throwaway local password): wrong password refused, signed in, switched to Practice, queued a job (it started making on its own), Approve, Reject, Redo with edited words, Approve all with its confirm; the approved picture was served as WebP at 256×256 and 64×64; the usage page saved a balance; a Make art button on the home page made and placed a portrait. Keyboard pass: every control reachable with a visible focus ring, and the whole loop driven with Enter.
+- Fixed from that run: two number boxes with no label, Redo not restarting the queue, the usage page hiding Google, focus after Approve all, the sign-in form layout. Also changed listed pictures to stable ids, so reordering the art list never scrambles the factory's records.
+- Asset Forge's catalogue output passes the kit's own checker.
+
+**Not done / not tested**
+- **No real picture maker, Redis or R2 was used.** OpenAI and Google were tested with recorded answers, R2 with a stand-in bucket, Redis with a stand-in client. The first real run in a project is the real test.
+- Not yet installed in one of Max's own projects, so the skill itself hasn't run end to end there.
+- Not deployed to Vercel.
+- MaxTemplateWithAgents not refreshed yet (copy `starter/` into it).
+- Not carried over from DnD-Max: Anthropic's own cost report (needs an Anthropic admin key), the Vercel Blob fallback, and the storage mover (Max left it out).
+- The BVD did not review this; Max made the design calls directly. Offer a Quick Council before the first real install if he wants one.
+- The dollar estimates are only as good as the price table (dated 2026-10-16, OpenAI rows from third-party pages).
 
 ---
 

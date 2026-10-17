@@ -23,7 +23,8 @@ Every agent on one page. In Claude, type the slash command or just say the phras
 | `/focus-group` | "playtest this" · "quick playtest with Pat and Lee" | Testers play it and report: Pat, Duke, Nadia, Grizz, Sam, Dale, Kai, Jax, Lee |
 | `/focus-group` | "full playtest" · "demo weekend" | All nine testers, separately (Claude Code) |
 | `/deploy-doctor` | "the deploy broke" · "check the latest deploy" | Reads Vercel logs, diagnoses, proposes the fix |
-| `/asset-forge` | "I need art for..." | Style bible, then a clickable prompt queue for ChatGPT |
+| `/asset-forge` | "I need art for..." | Style bible and art list, then the Art Factory's catalogue (or a clickable prompt queue for ChatGPT) |
+| `/art-factory` | "set up the art factory" · "update the art factory" | Installs the in-app art factory, AI cost tracker and Make art buttons into the project, wired to its art list |
 | `/translator` | "explain that" · "what did you change?" | Plain-English change report (the Wrap includes it) |
 | `/scribe` | "status" · "overview" · "commit notes" | Log entries and status overviews (the Wrap includes it) |
 | `/handoff-packer` | "pack it up" · "handoff for GPT" | A HANDOFF.md brief any tool can pick up cold |
