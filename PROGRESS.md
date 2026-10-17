@@ -1,8 +1,9 @@
-# Status · 2026-10-16 · v1.1 (not pushed)
+# Status · 2026-10-16 · v1.1 (on PR #2, not merged)
 **Where we are:** **AgentMax v1.0 + the Art Factory.** 14 agents: 13 ✅ proven, plus the new **Art Factory** (🧪 tested in a fresh Next.js app, not yet in one of Max's projects). The template now ships its first code kit, `starter/kits/art-factory/`. New builds start from the MaxTemplateWithAgents template.
-**Next up:** install the Art Factory into Max's next real project and make real art with it; refresh MaxTemplateWithAgents from `starter/`.
+**Next up:** build **Content Factory MAX** from the BVD plan (council/2026-10-16-art-factory-review.md), phase 1 first: the media-neutral engine and the safety nets.
 **Waiting on Max:**
-- OK to push the Art Factory commit.
+- Merge PR #2 when happy.
+- DnD-Max's live factory has the same 3-minute lease bug the BVD found (a slow picture can be paid for twice at 2+ lanes): fix it in the DnD-Max repo.
 - Copy `starter/` into MaxTemplateWithAgents so new projects get the kit.
 - Mark MaxTemplateWithAgents as a template on GitHub (Settings → tick "Template repository").
 - Delete the QA sample branch `docs/agentmax-qa-2026-10-15` in DnD-Max (GitHub → Branches → trash icon) and test table QXT-RZN on the live site.
@@ -11,6 +12,24 @@
 # Progress Log
 
 Newest on top. Each entry quotes the request that caused it.
+
+---
+
+## 2026-10-16 · BVD Full Council on the Art Factory → Content Factory MAX; seat 01 is now DuderMax
+
+> "can we have the BVD do a review of the art-factory universal and see what they think and what should be changed or added. the keys for them are UNIVERSAL and CUSTOMIZABLE … perhaps we need to consider the other AI generated content, like audio … let them cook and ill expect a questionaire with feedback sourced direction options and ideas."
+
+**What happened**
+- **Full Council, all 11 seats** as separate subagents (read-only; none ran code). Verdict: **APPROVE WITH CHANGES, 11 of 11**. Record, seat-by-seat, and the build plan: `council/2026-10-16-art-factory-review.md`.
+- I looked at the live DnD-Max admin in Max's browser for them, **read only, nothing pressed**: 907 pictures / 216 approved, ~$0.095 per picture with redos vs 3.5¢ list, two violence refusals, and a working Voices studio.
+- **Max answered the questionnaire:** full studio (pictures, voices, sound effects, music), named **Content Factory MAX**, Next.js only for now, real runs + a DnD-Max shakedown before "Proven", review mode + grid, refusal help both ways, old versions kept + stop at zero + per-run limit, no rule on voice cloning, Asset Forge drafts alt text, prompt fixes saved versioned to the project's own list, themes with presets and a picker, a banner + contact sheet when a group is done. All in RULES.md, tagged Max.
+- **Bug fixed from Henry's review:** the "picture is lost" lease (3 min) was no longer than OpenAI's own timeout, so at 2+ lanes a slow picture could be drawn and paid for twice. Lease is now 7 min, longer than the 300 s route limit; new test. **DnD-Max's live factory still has the 3-minute lease.**
+- **Seat 01 renamed DuderMax.** Max: "an AI logging things as my name? i dont want this so his name should be MaxDuderino if thats not already in use. please update in all agent configs." MaxDuderino is his GitHub name and commit author, so I asked; he picked **DuderMax**. Changed in the persona sources, the BVD skill, LINEUP, the canon notes (the .docx keeps history), new rule 26a, and both installers (they now remove the retired `bvd-max-bullis` agent). Rebuilt, reinstalled into `~/.claude` (old agent file and old persona copy removed), and refreshed `~/.claude/RULES.md`.
+- Jerry caught two stale lines here (status said "not pushed"; "70 tests"): fixed.
+
+**Not done**
+- Content Factory MAX itself is not built yet: this was the review and the questionnaire. The plan is phased in the council file.
+- Older council records (2026-10-15) and the .docx still say "Max Bullis" as history.
 
 ---
 
@@ -25,7 +44,7 @@ Max's choices: where the code lives, **"In the template"**; the kit includes the
   - Screens: Art factory (queue, review tray with Approve / Approve all / Redo / Edit words / Reject, styles, pace, credit box), picture maker switcher (OpenAI / Google with model, quality and prices), AI usage & credits, ✨ Make art button, admin sign-in.
   - **New, beyond DnD-Max:** **Practice** mode (free placeholder pictures, to rehearse the whole flow with no key), a one-password admin gate for projects without accounts, Empty the queue, a progress bar, Redo also starts making, and one self-contained stylesheet with dark mode.
   - `install.mjs` installs or updates the kit in any Next.js project (names-only `.env.example`, deps, `@/*` path; never overwrites the project's own config or catalogue).
-  - 70 tests of its own (`npm test`), and it typechecks against Next 16.
+  - 70 tests of its own at the time (`npm test`; 72 after the review fixes), and it typechecks against Next 16.
 - **New skill: `art-factory`.** Installs the kit into a new or existing project, makes it that project's factory (catalogue from Asset Forge, style blocks, Make art buttons that really save), walks Max through keys (names only, Key Keeper rules), Redis and R2, and checks it works before calling it done.
 - **Asset Forge feeds the factory.** New `build_catalogue.py` turns `prompts.json` into the factory's `art-catalogue.json` (stable ids, size presets, a style block per family). The ChatGPT paste queue stays as the fallback for projects with no factory.
 - **Pipeline:** `tools/build.py` copies each kit into its skill (`art-factory/kit/`), removes files a kit dropped, and leaves `node_modules` out of the zips.

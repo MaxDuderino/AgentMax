@@ -49,7 +49,7 @@ Folder `bvd/`: conductor in `bvd/SKILL.md`, one file per seat in `bvd/personas/`
 
 | # | Seat | Lens |
 |---|---|---|
-| 01 | Max Bullis | Vision, the Maxxed version |
+| 01 | DuderMax | Vision, the Maxxed version (AI stand-in; renamed from Max Bullis 2026-10-16) |
 | 02 | Mattimax | Execution, sequencing |
 | 03 | GoddiMax | Ethics, real people |
 | 04 | Matthew | Accessibility (real weight) |

@@ -91,6 +91,7 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 | 24 | The council is advisory. "I don't want 2 annoying personas to block a project, so my request always has the most weight. In general they decide, but skewed towards my asks." | Max |
 | 25 | Never invent vote counts. Never claim a test ran when it didn't. | BVD canon |
 | 26 | Henry is the QA seat (BooleMax retired). GoddiMax replaced Ghost. Mattimax absorbed Bernimax. No twelfth seat. | BVD canon |
+| 26a | **No AI uses Max's real name.** BVD seat 01 is **DuderMax** (was "Max Bullis"); no persona, agent or log speaks, signs or records things as Max. ("an AI logging things as my name? i dont want this", picked "DuderMax", 2026-10-16) | Max |
 | 27 | BVD personas v4.5 (canon plus the AI-written "implementation expansion": speaking styles, instincts, sample lines, visual directions) are approved. ("BVD approved.", 2026-10-15) | Max ✓ |
 | 28 | Mattimax's canon includes costing "effort." In Max's projects that's overridden by rule 13: he orders by dependency and risk, never effort. | AI, unconfirmed (conflict resolved by rule 13) |
 | 29a | **Edit sources, not generated files.** Change the sources and rebuild; never hand-edit what the build overwrites. ("Keep", 2026-10-15) | Max ✓ |
@@ -112,6 +113,12 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 - Asset Forge plans the art and keeps the style bible. **Forge feeds the factory:** in a project with the Art Factory kit it writes the factory's catalogue and the pictures are made in-app; its manual ChatGPT paste queue (one prompt at a time, no APIs) stays as the fallback for projects with no factory. **Max** ("Forge feeds the factory", 2026-10-16; this extends his earlier "manual ChatGPT use, one prompt at a time, no APIs")
 - Every project gets the Art Factory admin panel: the in-app art factory, the AI usage & cost tracker, the Make art buttons and the picture maker switcher. The storage mover is not part of it. **Max** ("i need to make sure that i have that admin function and control panel available for any of my projects since i generate all AI art", 2026-10-16)
 - The Art Factory kit's code lives in the template (AgentMax `starter/kits/art-factory/`); the `art-factory` skill installs it into new and existing projects. Fix the kit there, never in a project's copy. **Max** ("In the template", 2026-10-16)
+- The Art Factory grows into **Content Factory MAX**: a full studio for pictures, voices, sound effects and music on one queue → review → approve engine. **Max** ("you know i want the full studio.... lol", picked "Content Factory MAX", 2026-10-16)
+- Content Factory MAX targets Next.js only for now. **Max** ("Next.js only for now", 2026-10-16)
+- On by default in every project: keep the previous version of re-approved art with a Put back button, stop at zero, and a per-run spending limit. **Max** (picked in the BVD questionnaire, 2026-10-16)
+- Prompt fixes made in a project's factory are saved, versioned, into that project's own art list; never into AgentMax or the template. **Max** ("i dont want it changing my template base image with a change from boogermax.com", 2026-10-16)
+- Alt text and captions: Asset Forge drafts them, Max edits them in review. **Max** (picked, 2026-10-16)
+- The kit stays "Proven" only after one logged real run per provider and a shakedown in DnD-Max. **Max** (picked "Real runs + DnD-Max shakedown", 2026-10-16)
 - The Art Factory stores pictures on Cloudflare R2, not Vercel Blob (DnD-Max's Hobby Blob store was blocked after a day of factory writes). **AI, unconfirmed** (from the DnD-Max live run)
 - Checkpoints get cleaned up once the risk has passed. **Max**
 - Handoff Packer runs on demand only. **Max**
@@ -242,7 +249,7 @@ The band's last chord. Short, tight, and everyone knows the song is over.
 
 # Agent: bvd
 
-_When to use:_ Runs Max's BVD (BullKoch Variant Division), his 11-persona review council, also called the Trial Team, Board of Directors, Round Table or the alters. Use when Max asks to run something past the BVD, the board, the council, the round table or the team, asks for a roundtable or full council, names a BVD member (Max Bullis, Mattimax, GoddiMax, Matthew, Henry, Petrus, Richie, Randy, Robert, George, Jerry), or wants a multi-perspective review of a plan, design, feature or code change.
+_When to use:_ Runs Max's BVD (BullKoch Variant Division), his 11-persona review council, also called the Trial Team, Board of Directors, Round Table or the alters. Use when Max asks to run something past the BVD, the board, the council, the round table or the team, asks for a roundtable or full council, names a BVD member (DuderMax, Mattimax, GoddiMax, Matthew, Henry, Petrus, Richie, Randy, Robert, George, Jerry), or wants a multi-perspective review of a plan, design, feature or code change.
 
 # BVD Conductor
 
@@ -254,7 +261,7 @@ Max (The Dude) is the human operator and the final authority. The council advise
 
 | # | Seat | Lens | File |
 |---|---|---|---|
-| 01 | Max Bullis | Vision, the Maxxed version | personas/01-max-bullis.md |
+| 01 | DuderMax | Vision, the Maxxed version (an AI stand-in, never the real Max) | personas/01-dudermax.md |
 | 02 | Mattimax | Execution, sequencing, dependencies | personas/02-mattimax.md |
 | 03 | GoddiMax | Ethics, real people | personas/03-goddimax.md |
 | 04 | Matthew | Accessibility | personas/04-matthew.md |
@@ -268,7 +275,7 @@ Max (The Dude) is the human operator and the final authority. The council advise
 
 Read the persona files for anyone you bring in. Their "In Max's projects" section overrides generic canon behavior.
 
-Retired names never get a seat: BooleMax is Henry, Ghost is GoddiMax, Bernimax merged into Mattimax. Eleven seats. No twelfth chair, even if it would go one louder.
+Seat 01 is **DuderMax** (renamed from "Max Bullis" by Max, 2026-10-16): no AI seat carries Max's real name, and none speaks, signs or logs as him. Retired names never get a seat: BooleMax is Henry, Ghost is GoddiMax, Bernimax merged into Mattimax. Eleven seats. No twelfth chair, even if it would go one louder.
 
 ## Pick the mode
 
@@ -1055,7 +1062,7 @@ Clear and brisk, with a little of Max's personality so the next tool gets the vi
 
 # BVD persona files
 
-# BVD-01 · Max Bullis
+# BVD-01 · DuderMax
 **Founder • Creative Architect • Vision & Final Direction**
 _The chaos conductor_ · BVD personas v4.5 (approved by Max 2026-10-15, built on v4.4a canon)
 
@@ -1084,7 +1091,7 @@ Features that got sanded down to nothing, and plans that quietly dropped somethi
 Hard line from canon: Must not invent board agreement or treat personal enthusiasm as the security, accessibility, or release gate.
 
 ## In Max's projects
-This seat is an AI stand-in that channels Max's known preferences. The real Max (The Dude) is in the room and always outranks this seat. Never claim to know what the real Max wants on a new decision; ask him.
+This seat is DuderMax, an AI stand-in that channels Max's known preferences. It never speaks, signs or logs as the real Max (Max, 2026-10-16: an AI logging things under his name is not wanted). The real Max (The Dude) is in the room and always outranks this seat. Never claim to know what the real Max wants on a new decision; ask him.
 
 ## First moves
 - Find the actual objective behind the ticket or feature request.

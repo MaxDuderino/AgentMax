@@ -4,7 +4,7 @@ import example from "../art/art-catalogue.json";
 import { groupsFromFile, type CatalogueFile } from "../lib/art-factory/core/json-catalogue";
 import { indexCatalogue, type ApprovedPicture } from "../lib/art-factory/core/types";
 import { MemoryArtStore, R2ArtStore } from "../lib/art-factory/server/art-store";
-import { approve, approvedUrl, clearQueue, enqueue, isBusy, isOutOfCredit, makingLeaseMs, redo, reject, unqueue, work, type FactoryDeps } from "../lib/art-factory/server/factory-service";
+import { approve, approvedUrl, clearQueue, enqueue, isBusy, isOutOfCredit, longestDrawMs, makingLeaseMs, redo, reject, unqueue, work, type FactoryDeps } from "../lib/art-factory/server/factory-service";
 import { FactoryStore } from "../lib/art-factory/server/factory-store";
 import type { ImageProvider } from "../lib/art-factory/server/image-provider";
 import { MemoryKv } from "../lib/art-factory/server/kv";
@@ -175,6 +175,20 @@ describe("the art factory queue", () => {
     const waited = await work(deps);
     expect(waited.kind).toBe("wait");
     expect(waited.kind === "wait" && waited.ms).toBe(60_000 - 10_000 + 250);
+  });
+
+  it("a slow draw is never taken for lost: the lease outlasts the longest a route may run", async () => {
+    expect(makingLeaseMs).toBeGreaterThan(longestDrawMs + 60_000);
+    const { deps, store, clock } = setup();
+    await enqueue(deps, [heart, star]);
+    const entry = (await store.entry(heart))!;
+    // Another lane is still drawing the heart, 299 s in.
+    await store.save({ ...entry, status: "making", startedAt: new Date(clock.now).toISOString(), attempts: 1 });
+    await store.lock(heart, makingLeaseMs);
+    clock.now += longestDrawMs - 1000;
+    const next = await work(deps);
+    expect(next.kind === "made" && next.imageId).toBe(star);
+    expect((await store.entry(heart))!.status).toBe("making");
   });
 
   it("a picture whose function died mid-draw goes back in the queue once its lease runs out", async () => {

@@ -44,7 +44,11 @@ export interface FactoryDeps {
 }
 
 /** How long a picture may be "being drawn" before it is assumed lost and queued again. */
-export const makingLeaseMs = 3 * 60 * 1000;
+// Longer than any one draw can live: a route runs at most 300 s (OpenAI alone may take 180 s twice, with the see-through
+// retry), so a slow picture is never taken for lost and drawn, and paid for, a second time by another lane (BVD, Henry, 2026-10-16).
+export const makingLeaseMs = 7 * 60 * 1000;
+/** The longest a factory route is allowed to run (`maxDuration` on the routes). The lease must outlast it. */
+export const longestDrawMs = 300 * 1000;
 /** Tries before a picture that keeps failing is left for a person to look at. */
 export const maxAttempts = 3;
 

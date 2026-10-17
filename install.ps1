@@ -14,6 +14,8 @@ Get-ChildItem -Directory $here | Where-Object { Test-Path (Join-Path $_.FullName
   Copy-Item -Recurse -Force (Join-Path $_.FullName "*") $dest
   Write-Host "Skill installed: $($_.Name)"
 }
+# Retired agent files (seat 01 was renamed DuderMax on 2026-10-16)
+foreach ($old in @("bvd-max-bullis.md")) { $p = Join-Path $agents $old; if (Test-Path $p) { Remove-Item -Force $p; Write-Host "Removed retired agent: $old" } }
 Copy-Item -Force (Join-Path $here "claude-code\agents\*.md") $agents
 Write-Host "Subagents installed to $agents (11 BVD seats, 9 testers, 3 QA roles)"
 Write-Host "Restart Claude Code, then try: /session-kickoff or /bvd"

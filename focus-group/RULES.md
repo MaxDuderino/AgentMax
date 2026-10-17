@@ -60,6 +60,7 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 | 24 | The council is advisory. "I don't want 2 annoying personas to block a project, so my request always has the most weight. In general they decide, but skewed towards my asks." | Max |
 | 25 | Never invent vote counts. Never claim a test ran when it didn't. | BVD canon |
 | 26 | Henry is the QA seat (BooleMax retired). GoddiMax replaced Ghost. Mattimax absorbed Bernimax. No twelfth seat. | BVD canon |
+| 26a | **No AI uses Max's real name.** BVD seat 01 is **DuderMax** (was "Max Bullis"); no persona, agent or log speaks, signs or records things as Max. ("an AI logging things as my name? i dont want this", picked "DuderMax", 2026-10-16) | Max |
 | 27 | BVD personas v4.5 (canon plus the AI-written "implementation expansion": speaking styles, instincts, sample lines, visual directions) are approved. ("BVD approved.", 2026-10-15) | Max ✓ |
 | 28 | Mattimax's canon includes costing "effort." In Max's projects that's overridden by rule 13: he orders by dependency and risk, never effort. | AI, unconfirmed (conflict resolved by rule 13) |
 | 29a | **Edit sources, not generated files.** Change the sources and rebuild; never hand-edit what the build overwrites. ("Keep", 2026-10-15) | Max ✓ |
@@ -81,6 +82,12 @@ If a rule isn't in this file, it isn't a rule. Any agent that hits a "must" or "
 - Asset Forge plans the art and keeps the style bible. **Forge feeds the factory:** in a project with the Art Factory kit it writes the factory's catalogue and the pictures are made in-app; its manual ChatGPT paste queue (one prompt at a time, no APIs) stays as the fallback for projects with no factory. **Max** ("Forge feeds the factory", 2026-10-16; this extends his earlier "manual ChatGPT use, one prompt at a time, no APIs")
 - Every project gets the Art Factory admin panel: the in-app art factory, the AI usage & cost tracker, the Make art buttons and the picture maker switcher. The storage mover is not part of it. **Max** ("i need to make sure that i have that admin function and control panel available for any of my projects since i generate all AI art", 2026-10-16)
 - The Art Factory kit's code lives in the template (AgentMax `starter/kits/art-factory/`); the `art-factory` skill installs it into new and existing projects. Fix the kit there, never in a project's copy. **Max** ("In the template", 2026-10-16)
+- The Art Factory grows into **Content Factory MAX**: a full studio for pictures, voices, sound effects and music on one queue → review → approve engine. **Max** ("you know i want the full studio.... lol", picked "Content Factory MAX", 2026-10-16)
+- Content Factory MAX targets Next.js only for now. **Max** ("Next.js only for now", 2026-10-16)
+- On by default in every project: keep the previous version of re-approved art with a Put back button, stop at zero, and a per-run spending limit. **Max** (picked in the BVD questionnaire, 2026-10-16)
+- Prompt fixes made in a project's factory are saved, versioned, into that project's own art list; never into AgentMax or the template. **Max** ("i dont want it changing my template base image with a change from boogermax.com", 2026-10-16)
+- Alt text and captions: Asset Forge drafts them, Max edits them in review. **Max** (picked, 2026-10-16)
+- The kit stays "Proven" only after one logged real run per provider and a shakedown in DnD-Max. **Max** (picked "Real runs + DnD-Max shakedown", 2026-10-16)
 - The Art Factory stores pictures on Cloudflare R2, not Vercel Blob (DnD-Max's Hobby Blob store was blocked after a day of factory writes). **AI, unconfirmed** (from the DnD-Max live run)
 - Checkpoints get cleaned up once the risk has passed. **Max**
 - Handoff Packer runs on demand only. **Max**
